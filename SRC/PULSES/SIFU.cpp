@@ -60,7 +60,7 @@ void CSIFU::rising_puls()
     N_Pulse = 6;    
     break;   
   case EOperating_mode::PHASING:
-    // Ограничения сдвига и приращения сдвига синхронизации 
+    // Ограничения сдвига и приращения сдвига 
     if(v_sync.task_power_shift > s_const.Max_power_shift) v_sync.task_power_shift = s_const.Max_power_shift;
     if(v_sync.task_power_shift < s_const.Min_power_shift) v_sync.task_power_shift = s_const.Min_power_shift;   
     A_Task_tick = s_const._0gr;
@@ -73,13 +73,14 @@ void CSIFU::rising_puls()
     }
     v_sync.prev_power_shift = v_sync.cur_power_shift;
     CEEPSettings::getInstance().getSettings().power_shift = v_sync.cur_power_shift;
+    
+    timing_calc();     // Расчёт тайминга для следующего импульса
+    break;
   case EOperating_mode::NORMAL:
-    // Классические ограничения альфа и приращения
-    if(Operating_mode != EOperating_mode::PHASING)
-    {
-      if(A_Task_tick > s_const.A_Max_tick) A_Task_tick = s_const.A_Max_tick;
-      if(A_Task_tick < s_const.A_Min_tick) A_Task_tick = s_const.A_Min_tick;   
-    } 
+    // Ограничения альфа и приращения альфа   
+    if(A_Task_tick > s_const.A_Max_tick) A_Task_tick = s_const.A_Max_tick;
+    if(A_Task_tick < s_const.A_Min_tick) A_Task_tick = s_const.A_Min_tick;   
+    
     d_Alpha = A_Task_tick - A_Prev_tick;    
     if (abs(d_Alpha) < s_const.d_A_Max_tick) A_Cur_tick = A_Task_tick;     
     else 
@@ -89,25 +90,28 @@ void CSIFU::rising_puls()
     }
     A_Prev_tick = A_Cur_tick;
     
-    // Расчёт тайминга для следующего импульса
-    if(v_sync.SYNC_EVENT)
-    {
-      v_sync.SYNC_EVENT = false;
-      //v_sync.sync_timing = v_sync.CURRENT_SYNC + offsets[N_Pulse];
-      //LPC_TIM3->MR0 = v_sync.sync_timing + A_Cur_tick + v_sync.cur_power_shift;
-      LPC_TIM3->MR0 = 
-        v_sync.CURRENT_SYNC + 
-        offsets[N_Pulse] + 
-        A_Cur_tick + 
-        v_sync.cur_power_shift;
-    }
-    else
-    {
-      LPC_TIM3->MR0 = LPC_TIM3->MR0 + s_const._60gr + d_Alpha;
-    }    
+    timing_calc();     // Расчёт тайминга для следующего импульса
     break;
   }    
    rPulsCalc.conv_and_calc(); // Измерения, вычисления и т.п.
+}
+
+void CSIFU::timing_calc()
+{
+  if(v_sync.SYNC_EVENT)
+  {
+    v_sync.SYNC_EVENT = false;
+    //v_sync.sync_timing = v_sync.CURRENT_SYNC + offsets[N_Pulse];
+    //LPC_TIM3->MR0 = v_sync.sync_timing + A_Cur_tick + v_sync.cur_power_shift;
+    LPC_TIM3->MR0 = 
+      v_sync.CURRENT_SYNC +         
+     (A_Cur_tick + offsets[N_Pulse]) + 
+      v_sync.cur_power_shift;
+  }
+  else
+  {
+    LPC_TIM3->MR0 = LPC_TIM3->MR0 + s_const._60gr + d_Alpha;
+  }    
 }
 
 void CSIFU::faling_puls()
@@ -205,8 +209,8 @@ void  CSIFU::start_phasing_mode()
 }
 void  CSIFU::stop_phasing_mode()
 {
-  Operating_mode = EOperating_mode::NORMAL;
   A_Task_tick = s_const.A_Max_tick;
+  Operating_mode = EOperating_mode::NORMAL;
 }
 void CSIFU::set_a_shift(signed short shift)
 {

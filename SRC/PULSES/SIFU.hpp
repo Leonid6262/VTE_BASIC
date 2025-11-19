@@ -44,6 +44,7 @@ private:
   signed short d_Alpha;
   
   void control_sync();
+  void timing_calc();
   
   enum class EOperating_mode {
     NO_SYNC,           
@@ -102,7 +103,6 @@ private:
     float SYNC_FREQUENCY;               // Измеренная частота                   
     
   } v_sync;
-  
   
   // -- Аппаратные константы ----------------------------------------------------------------------
   
