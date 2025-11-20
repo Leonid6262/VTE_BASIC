@@ -26,7 +26,7 @@ public:
   void set_d_shift(unsigned char);    // Установка дискретного сдвига синхронизации
   void set_alpha(signed short);       // Установка Alpha
   
-  float get_Sync_Frequency();
+  float get_Sync_Frequency();         // Возвращает частоту синхронизации
  
 private:
  
@@ -40,12 +40,11 @@ private:
   
   signed short A_Task_tick;  
   signed short A_Cur_tick; 
-  signed short A_Prev_tick;
-  signed short d_Alpha;
   
   void control_sync();
-  void timing_calc();
-  signed short limits(signed short*, signed short,signed short);
+  signed int timing_calc();
+  signed short limits_val( signed short*, signed short,  signed short);
+  signed short limits_dval(signed short*, signed short*, signed short);
   
   enum class EOperating_mode {
     NO_SYNC,           
@@ -90,8 +89,8 @@ private:
    
     signed short cur_power_shift;      // Точный сдвиг синхронизации.
     signed short task_power_shift;       
-    signed short prev_power_shift;
-    signed short d_shift;
+    //signed short prev_power_shift;
+    //signed short d_shift;
     
     bool SYNC_EVENT;                    // Флаг события захвата
     unsigned int CURRENT_SYNC;          // Актуальные данные захвата

@@ -75,8 +75,8 @@ void main(void)
   static CDAC_PWM pwm_dac1(CDAC_PWM::EPWM_DACInstance::PWM_DAC1);   // DAC-1 (PWM1:5, Cos_phi)
   static CDAC_PWM pwm_dac2(CDAC_PWM::EPWM_DACInstance::PWM_DAC2);   // DAC-2 (PWM1:4. 4...20mA)
   
-  static CIADC i_adc;                   // Внутренее ADC.
-  static CADC adc;                      // Внешнее ADC.
+  static CIADC i_adc;           // Внутренее ADC.
+  static CADC adc;              // Внешнее ADC.
   
   static CSPI_ports spi_ports;  // Дискретные входы и выходы доступные по SPI. Примеры доступа: 
                                 //      if(rSpi_ports.Stator_Key()){...}
@@ -115,7 +115,8 @@ void main(void)
                                   CRTC::SDateTime CurDateTime = {year, month, day, hour, min, sec};                                       
                                   rRt_clockc.setDateTime(CurDateTime); <--данные пишутся в RTC в момент выполнения setDateTime(CurDateTime)
                               */
-  static CPULSCALC puls_calc(adc);  // Измерение всех аналоговых сигналов, восстанавление параметров напряжения и тока статора.                                          
+  static CPULSCALC puls_calc(adc);  // Измерение всех аналоговых сигналов, 
+                                    // восстанавление параметров напряжения и тока статора, и т.п.                                          
                                    
   static CSIFU sifu(puls_calc); /* Классическое, компактное СИФУ, на одном таймере.
                                    Handler синхронизации не используется. */                                                 
@@ -126,7 +127,7 @@ void main(void)
     {      
       // Указатели на отображаемые переменные.
        &adc.data[CADC::ROTOR_CURRENT],         
-       &adc.data[CADC::STATOR_VOLTAGE],//&sifu.rPulsCalc.U_STATORA,                         // Напряжение статора [rms]
+       &sifu.rPulsCalc.U_STATORA,                         // Напряжение статора [rms]
        &sifu.rPulsCalc.I_STATORA,                         // Полный ток статора [rms]
        &adc.data[CADC::ROTOR_VOLTAGE],            
        &adc.data[CADC::LEAKAGE_CURRENT],                                                                
@@ -138,15 +139,15 @@ void main(void)
       "I_ROT","USTAT","ISTAT","U_ROT","I_LEK","I_NOD","E_SET"
     },
     {
-      // Коэффициенты отображения (дискрет на 100%)
+      // Уставки коэффициентов отображения (дискрет на 100%)
       CEEPSettings::getInstance().getSettings().disp_c.p_i_rotor, 
-      100,//CEEPSettings::getInstance().getSettings().disp_c.p_ustat_rms,
+      CEEPSettings::getInstance().getSettings().disp_c.p_ustat_rms,
       CEEPSettings::getInstance().getSettings().disp_c.p_istat_rms,
       CEEPSettings::getInstance().getSettings().disp_c.p_u_rotor,
       CEEPSettings::getInstance().getSettings().disp_c.p_i_leak,
       CEEPSettings::getInstance().getSettings().disp_c.p_i_node,
       CEEPSettings::getInstance().getSettings().disp_c.p_e_set
-      // По d_100p[NUMBER_TRACKS] определяется фактическое количество треков. 
+      // Количество треков определяется по ёмкости этого массива (d_100p) 
     },
     // Режим работы Access_point или Station
     CREM_OSC::Operating_mode::Access_point,
@@ -158,16 +159,18 @@ void main(void)
     CEEPSettings::getInstance().getSettings().ssid,
     CEEPSettings::getInstance().getSettings().password 
   };
-  static CREM_OSC rem_osc(cont_dma, set_init);  // Дистанционный осциллограф (ESP32 c WiFi модулем).Карту каналов DMA с.м. в controllerDMA.hpp               // 
-                                                // Передача данных (метод send_data()) осуществляется в точке, где отображаемые переменные обновлены,
-                                                // например в IRQ ИУ. В примере, send_data() вызывается в handler TIMER3
-                                                // с.м файл обработчиков прерываний "handlers_IRQ.cpp".
+  static CREM_OSC rem_osc(cont_dma, set_init);  /* Дистанционный осциллограф (ESP32 c WiFi модулем).
+                                                   Карту каналов DMA с.м. в controllerDMA.hpp 
+                                                   Передача данных (метод send_data()) осуществляется в точке, 
+                                                   где отображаемые переменные обновлены, например в IRQ ИУ. 
+                                                   В примере, send_data() вызывается в handler TIMER3 (СИФУ)
+                                                   с.м файл обработчиков прерываний "handlers_IRQ.cpp".*/
   
   CProxyHandlerTIMER::getInstance().set_pointers(&sifu, &rem_osc);  // Proxy Singleton доступа к Handler TIMER.
                                                                     // Данный патерн позволяет избежать глобальных 
                                                                     // ссылок на sifu, и rem_osc
   
-  sifu.init_and_start();                        // Старт SIFU
+  sifu.init_and_start();        // Старт SIFU
   
 /*--Объекты классов тестов--*/
     
