@@ -12,10 +12,6 @@ public:
   
   CPULSCALC& rPulsCalc;
   
-  void init_and_start();
-  void rising_puls();
-  void faling_puls();
-
   void set_forcing_bridge();          // Подать импульсы на форсировочный мост    
   void set_main_bridge();             // Подать импульсы на основной мост
   void pulses_stop();                 // Снять импульсы с обоих мостов
@@ -27,10 +23,15 @@ public:
   void set_alpha(signed short);       // Установка Alpha
   
   float get_Sync_Frequency();         // Возвращает частоту синхронизации
+  
+  void init_and_start(); // Инициализация       
+  void rising_puls();    // Фронт импульса
+  void faling_puls();    // Спад импульса
  
 private:
  
   static const unsigned char pulses[];
+  static const unsigned char pulse_w_one[];
   static const signed  short offsets[];
   
   bool forcing_bridge;
@@ -89,8 +90,6 @@ private:
    
     signed short cur_power_shift;      // Точный сдвиг синхронизации.
     signed short task_power_shift;       
-    //signed short prev_power_shift;
-    //signed short d_shift;
     
     bool SYNC_EVENT;                    // Флаг события захвата
     unsigned int CURRENT_SYNC;          // Актуальные данные захвата

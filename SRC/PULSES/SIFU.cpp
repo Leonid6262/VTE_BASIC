@@ -2,14 +2,15 @@
 #include <algorithm>
 #include "system_LPC177x.h"
 
-const unsigned char CSIFU::pulses[]  = {0x00, 0x21, 0x03, 0x06, 0x0C, 0x18, 0x30}; // Индекс 0 не используется
+const unsigned char CSIFU::pulses[]      = {0x00, 0x21, 0x03, 0x06, 0x0C, 0x18, 0x30}; // Индекс 0 не используется
+const unsigned char CSIFU::pulse_w_one[] = {0x00, 0x21, 0x00, 0x06, 0x00, 0x18, 0x00}; // Индекс 0 не используется
 const signed short  CSIFU::offsets[] = 
 {
  0, 
    SIFUConst::_60gr,  // Диапазон 0...60        (sync "видит" 1-й: ->2-3-4-5-6-sync-1->2-3-4...)
    SIFUConst::_120gr, // Диапазон -60...0       (sync "видит" 2-й: ->3-4-5-6-1-sync-2->3-4-5...)
-   SIFUConst::_180gr, // Диапазон -120...-60    (sync "видит" 3-й: ->4-5-6-1-2-sync-3->4-5-6...)
-  -SIFUConst::_120gr, // Диапазон 180...240     (sync "видит" 4-й: ->5-6-1-2-3-sync-4->5-6-1...)
+   SIFUConst::_180gr, // Диапазон -120...-60    (sync "видит" 3-й: ->4-5-6-1-2-sync-3->4-5-6...) - чисто теоретически
+  -SIFUConst::_120gr, // Диапазон 180...240     (sync "видит" 4-й: ->5-6-1-2-3-sync-4->5-6-1...) - чисто теоретически
   -SIFUConst::_60gr,  // Диапазон 120...180     (sync "видит" 5-й: ->6-1-2-3-4-sync-5->6-1-2...)
    SIFUConst::_0gr    // Диапазон 60...120      (sync "видит" 6-й: ->1-2-3-4-5-sync-6->1-2-3...)
 }; // Индекс 0 не используется
@@ -50,12 +51,19 @@ void CSIFU::rising_puls()
     LPC_TIM3->MR0 = LPC_TIM3->MR0 + s_const._60gr;       // Старт следующего через 60 градусов
     break;  
   case EOperating_mode::RESYNC:           
-    Operating_mode = EOperating_mode::NORMAL;    // Синхронизация с 1-го в Alpha_max
+    {Operating_mode = EOperating_mode::NORMAL;           // Синхронизация с 1-го в Alpha_max
     A_Task_tick = s_const.A_Max_tick;
     A_Cur_tick = s_const.A_Max_tick; 
     // 1-2-3-4-sync-5->6-1-2-3-4-sync-5->6-1-2....
-    LPC_TIM3->MR0 = v_sync.CURRENT_SYNC + A_Cur_tick + v_sync.cur_power_shift;
-    N_Pulse = 6;    
+    // Здесь и далее, кастования слагаемых приведены для наглядности,
+    // без магии циклической арифметики таймера по модулю 2^32
+    // LPC_TIM3->MR0 = v_sync.CURRENT_SYNC + A_Cur_tick + v_sync.cur_power_shift;
+    signed int res = 
+               static_cast<signed int>(v_sync.CURRENT_SYNC)
+             + static_cast<signed int>(A_Cur_tick)
+             + static_cast<signed int>(v_sync.cur_power_shift);
+    LPC_TIM3->MR0 = static_cast<unsigned int>(res);    
+    N_Pulse = 6;}    
     break;   
   case EOperating_mode::PHASING:
     // Ограничения величины сдвига
@@ -74,28 +82,43 @@ void CSIFU::rising_puls()
    rPulsCalc.conv_and_calc(); // Измерения, вычисления и т.п.
 }
 
-signed short CSIFU::limits_val(signed short* input, signed short min, signed short max)
-{
-  if(*input > max) return max;
-  if(*input < min) return min;
-  return *input;
-}
-
 signed int CSIFU::timing_calc()
 {  
   // Ограничения приращения альфа
   signed short d_Alpha = limits_dval(&A_Task_tick, &A_Cur_tick, s_const.d_A_Max_tick);
   if(v_sync.SYNC_EVENT)
   {
+    // Коррекция по синхронизации
     v_sync.SYNC_EVENT = false;
-    return (v_sync.CURRENT_SYNC + (A_Cur_tick + offsets[N_Pulse]) + v_sync.cur_power_shift);
+    signed int ret = 
+               static_cast<signed int>(v_sync.CURRENT_SYNC)
+             + static_cast<signed int>(A_Cur_tick)
+             + static_cast<signed int>(offsets[N_Pulse])
+             + static_cast<signed int>(v_sync.cur_power_shift);
+    return static_cast<unsigned int>(ret);
+    //return (v_sync.CURRENT_SYNC + (A_Cur_tick + offsets[N_Pulse]) + v_sync.cur_power_shift);
   }
   else
   {
-    return LPC_TIM3->MR0 + s_const._60gr + d_Alpha;
+    // Продолжение последовательности
+    signed int ret = 
+               static_cast<signed int>(LPC_TIM3->MR0)
+             + static_cast<signed int>(s_const._60gr)
+             + static_cast<signed int>(d_Alpha);
+
+    return static_cast<unsigned int>(ret);
+    //return LPC_TIM3->MR0 + s_const._60gr + d_Alpha;
   }    
 }
 
+// Ограничение значения
+signed short CSIFU::limits_val(signed short* input, signed short min, signed short max)
+{
+  if(*input > max) return max;
+  if(*input < min) return min;
+  return *input;
+}
+// Ограничение приращения
 signed short CSIFU::limits_dval(signed short* input, signed short* output, signed short max)
 {  
   signed short d = *input - *output;

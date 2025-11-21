@@ -155,7 +155,7 @@
                     <item>sifu</item>
                     <item>test_eth</item>
                     <item>tests</item>
-                    <item></item>
+                    <item />
                 </expressions>
                 <col-names>
                     <item>Expression</item>
