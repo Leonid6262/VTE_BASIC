@@ -25,30 +25,33 @@ void CSIFU::rising_puls()
   //Старт ИУ форсировочного моста
   if(main_bridge)   
   {
+    LPC_GPIO3->CLR  = pulses[(((N_Pulse - 1) + v_sync.d_power_shift) % s_const.N_PULSES) + 1] << FIRS_PULS_PORT;
     LPC_IOCON->P1_2 = IOCON_P_PWM;        //P1_2->PWM0:1 (SUM-1)                 
     LPC_PWM0->PCR   = PCR_PWMENA1; 
     LPC_PWM0->TCR   = COUNTER_START;      //Старт счётчик b1<-0
-    LPC_PWM0->LER   = LER_012;            //Обновление MR0,MR1 и MR2 
-    LPC_GPIO3->CLR  = pulses[(((N_Pulse - 1) + v_sync.d_power_shift) % s_const.N_PULSES) + 1] << FIRS_PULS_PORT;
+    LPC_PWM0->LER   = LER_012;            //Обновление MR0,MR1 и MR2     
   }
   //Старт ИУ рабочего моста
   if(forcing_bridge)      
   {    
+    LPC_GPIO3->CLR  = pulses[(((N_Pulse - 1) + v_sync.d_power_shift) % s_const.N_PULSES) + 1] << FIRS_PULS_PORT;
     LPC_IOCON->P1_3 = IOCON_P_PWM;        //P1_3->PWM0:2 (SUM-2)        
     LPC_PWM0->PCR   = PCR_PWMENA2; 
     LPC_PWM0->TCR   = COUNTER_START;      //Старт счётчик b1<-0
-    LPC_PWM0->LER   = LER_012;            //Обновление MR0,MR1 и MR2
-    LPC_GPIO3->CLR  = pulses[(((N_Pulse - 1) + v_sync.d_power_shift) % s_const.N_PULSES) + 1] << FIRS_PULS_PORT;
+    LPC_PWM0->LER   = LER_012;            //Обновление MR0,MR1 и MR2    
   }
   
   control_sync();     // Мониторинг события захвата синхроимпульса
   
-  LPC_TIM3->MR1 = LPC_TIM3->MR0 + PULSE_WIDTH;          // Окончание текущего 
+  signed int cur_MR0 = static_cast<signed int>(LPC_TIM3->MR0);
   
   switch(Operating_mode)
   {
   case EOperating_mode::NO_SYNC:        
-    LPC_TIM3->MR0 = LPC_TIM3->MR0 + s_const._60gr;       // Старт следующего через 60 градусов
+    {signed int res = 
+                static_cast<signed int>(LPC_TIM3->MR0) 
+              + s_const._60gr;
+    LPC_TIM3->MR0 = static_cast<unsigned int>(res);}    // Старт следующего через 60 градусов
     break;  
   case EOperating_mode::RESYNC:           
     {Operating_mode = EOperating_mode::NORMAL;           // Синхронизация с 1-го в Alpha_max
@@ -57,7 +60,6 @@ void CSIFU::rising_puls()
     // 1-2-3-4-sync-5->6-1-2-3-4-sync-5->6-1-2....
     // Здесь и далее, кастования слагаемых приведены для наглядности,
     // без магии циклической арифметики таймера по модулю 2^32
-    // LPC_TIM3->MR0 = v_sync.CURRENT_SYNC + A_Cur_tick + v_sync.cur_power_shift;
     signed int res = 
                static_cast<signed int>(v_sync.CURRENT_SYNC)
              + static_cast<signed int>(A_Cur_tick)
@@ -78,8 +80,18 @@ void CSIFU::rising_puls()
     A_Task_tick = limits_val(&A_Task_tick, s_const.A_Min_tick, s_const.A_Max_tick); 
     LPC_TIM3->MR0 = timing_calc();      // Задание тайминга для следующего импульса 
     break;
-  }  
-   rPulsCalc.conv_and_calc(); // Измерения, вычисления и т.п.
+  } 
+  
+   
+  signed int res = cur_MR0 + SIFUConst::PULSE_WIDTH; 
+  //
+  //
+  // Ограничение длительности импульса при движении Alpha в сторону Alpha Min
+  //
+  //
+  LPC_TIM3->MR1 = static_cast<unsigned int>(res);                             // Окончание текущего
+                                
+  rPulsCalc.conv_and_calc(); // Измерения, вычисления и т.п.
 }
 
 signed int CSIFU::timing_calc()
@@ -244,7 +256,7 @@ void CSIFU::set_d_shift(unsigned char d_shift)
 {
   if(Operating_mode == EOperating_mode::PHASING)
   {
-    if(d_shift > (s_const.N_PULSES - 1)) d_shift = s_const.N_PULSES - 1;
+    if(d_shift > (s_const.N_PULSES - 1)) d_shift = s_const.N_PULSES - 1; // 0...5
     v_sync.d_power_shift = d_shift;
   }
 }
@@ -257,7 +269,7 @@ void CSIFU::init_and_start()
 {      
   forcing_bridge = false;
   main_bridge    = false;
-  
+ 
   N_Pulse = 1;   
   v_sync.d_power_shift    = CEEPSettings::getInstance().getSettings().d_power_shift;
   v_sync.task_power_shift = CEEPSettings::getInstance().getSettings().power_shift;
@@ -289,7 +301,7 @@ void CSIFU::init_and_start()
   
   LPC_TIM3->TC = 0;
   LPC_TIM3->MR0 = s_const._60gr;
-  LPC_TIM3->MR1 = s_const._60gr + PULSE_WIDTH;
+  LPC_TIM3->MR1 = s_const._60gr + SIFUConst::PULSE_WIDTH;
   LPC_TIM3->CCR  = TIM3_CAPTURE_RI;      //Захват T3 по фронту CAP1 без прерываний 
   LPC_TIM3->MCR  = TIM3_COMPARE_MR0;     //Compare TIM3 с MR0 - enabled
   LPC_TIM3->MCR |= TIM3_COMPARE_MR1;     //Compare TIM3 с MR1 - enabled

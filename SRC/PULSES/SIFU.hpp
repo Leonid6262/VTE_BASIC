@@ -71,6 +71,8 @@ private:
     static constexpr signed short _150gr = 8333;
     static constexpr signed short _180gr = 10000;
     
+    static constexpr signed int PULSE_WIDTH = 3048;  //us
+    
     static constexpr float TIC_SEC = 1000000.0;
     
     static constexpr signed short Max_power_shift   =  _90gr;
@@ -114,7 +116,6 @@ private:
   static constexpr unsigned int P1_3 = 0x03;                                 //Port1:3  
   
   static constexpr unsigned int PWM_WIDTH        = 10;                          //us
-  static constexpr unsigned int PULSE_WIDTH      = 550;                         //us
   static constexpr unsigned int OFF_PULSES       = 0x003F0000;                   //Импульсы в порту
   static constexpr unsigned int FIRS_PULS_PORT   = 16;                           //1-й импульс в порту 
   
