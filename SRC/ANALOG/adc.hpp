@@ -19,7 +19,7 @@ private:
     0x1400, 0x1480, 0x1500, 0x1580, 0x1600, 0x1680, 0x1700, 0x1780
   };
     
-  static constexpr unsigned int D_MODE_PULLUP   = 0x02 <<3 ;
+  static constexpr unsigned int D_MODE_PULLUP   = 0x02 <<3;
   static constexpr unsigned int IOCON_SPI       = 0x03;
   static constexpr unsigned int Hz_SPI          = 10000000;
   static constexpr unsigned int bits_tr         = 16;
@@ -27,26 +27,6 @@ private:
 public:
   
   CADC();
-  
-  // Список имён каналов
-  enum EADC_NameCh{
-    ROTOR_CURRENT       = 0,
-    STATOR_VOLTAGE      = 1,
-    ROTOR_VOLTAGE       = 2,
-    LEAKAGE_CURRENT     = 3,    
-    STATOR_CURRENT      = 4,             
-    LOAD_NODE_CURRENT   = 5,                                       
-    EXTERNAL_SETTINGS   = 6,             
-    Name_ch07,          
-    Name_ch08,            
-    Name_ch09,            
-    Name_ch10,            
-    Name_ch11,            
-    Name_ch12,           
-    Name_ch13,           
-    Name_ch14,            
-    ch_HRf              = 15     // Промежуточный канал (0.5 Ref)
-  };
   
   // Массив измеренных значений.
   // Пример доступа - adc.data[CADC::Rotor_current] 

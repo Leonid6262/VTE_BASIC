@@ -70,10 +70,10 @@ StatusRet CEMAC_DRV::writePHY(unsigned char reg, unsigned short value)
     {
       if (!(LPC_EMAC->MIND & BUSY)) 
       {
-        return StatusRet::SUCCESS;
+        return Success;
       }
     }        
-    return StatusRet::ERROR;  
+    return Error;  
 }
 
 StatusRet CEMAC_DRV::readPHY(unsigned char reg, unsigned short& value) 
@@ -88,20 +88,20 @@ StatusRet CEMAC_DRV::readPHY(unsigned char reg, unsigned short& value)
       {
         LPC_EMAC->MCMD = 0;
         value = LPC_EMAC->MRDD;
-        return StatusRet::SUCCESS;
+        return Success;
       }
     }
     LPC_EMAC->MCMD = 0;
-    return StatusRet::ERROR;
+    return Error;
 }
 
 // Инициализация PHY
 StatusRet CEMAC_DRV::initPHY() 
 {
   LPC_EMAC->SUPP = 0;  //10 Мбит/с.
-  if(writePHY(0x00, PHY_BMCR_RESET) == StatusRet::ERROR)   // Сброс PHY через BMCR (регистр 0, бит 15)
+  if(writePHY(0x00, PHY_BMCR_RESET) == Error)   // Сброс PHY через BMCR (регистр 0, бит 15)
   {
-    return StatusRet::ERROR;
+    return Error;
   }
   Pause_us(10000);
   
@@ -124,16 +124,16 @@ StatusRet CEMAC_DRV::initPHY()
   }
   // Проверка что установлена LAN8720
   ID_LAN8720 = false;
-  if((readPHY(PHY_REG_IDR1, reg1) == StatusRet::SUCCESS) && 
-      readPHY(PHY_REG_IDR2, reg2) == StatusRet::SUCCESS)
+  if((readPHY(PHY_REG_IDR1, reg1) == Success) && 
+      readPHY(PHY_REG_IDR2, reg2) == Success)
   {
     if (((reg1 << PHY_IDR1_SHIFT) | (reg2 & PHY_IDR2_MASK)) == LAN8720_ID)
     {
       ID_LAN8720 = true;
-      return StatusRet::SUCCESS;
+      return Success;
     }
   } 
-  return StatusRet::ERROR;
+  return Error;
 }
 
 // Инициализация EMAC
@@ -149,11 +149,11 @@ StatusRet CEMAC_DRV::initEMAC()
   LPC_EMAC->Command = CR_REGRESET | CR_TXRESET | CR_RXRESET | CR_PASSRUNTFRAME; 
   Pause_us(250); 
   
-  if(initPHY() == StatusRet::ERROR) // Инициализация PHY
+  if(initPHY() == Error) // Инициализация PHY
   {
     // Если PHY проинициализировать не удалось, всё остальное бессмысленно
     EMAC_Ready = false;
-    return StatusRet::ERROR;
+    return Error;
   }
   LPC_EMAC->MAC2    |= MAC2_FULL_DUP | MAC2_CRC_EN | MAC2_PAD_EN;
   LPC_EMAC->Command |= CR_FULLDUPLEX;
@@ -185,7 +185,7 @@ StatusRet CEMAC_DRV::initEMAC()
   LPC_EMAC->Command |= CR_RXENABLE | CR_TXENABLE | CR_FULLDUPLEX;
   
   EMAC_Ready = true;
-  return StatusRet::SUCCESS;
+  return Success;
 }
 
 void CEMAC_DRV::initDescriptors() 

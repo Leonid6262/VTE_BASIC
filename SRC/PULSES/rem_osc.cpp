@@ -142,7 +142,7 @@ void CREM_OSC::transfer_mode()
     break;
   case Operating_mode::Station:
     Ret = transfer_SSID();
-    if(Ret == StatusRet::SUCCESS)
+    if(Ret == Success)
     {
       Ret = transfer_Password();
     }    
@@ -171,11 +171,11 @@ StatusRet CREM_OSC::transfer_SN_ID()
     start_dma_transfer();
     Pause_us(6000);    
   }
-  if(echo_check() == StatusRet::SUCCESS)
+  if(echo_check() == Success)
   {
-    return StatusRet::SUCCESS;
+    return Success;
   }
-  return StatusRet::ERROR;
+  return Error;
 }
 
 // Передача в ESP32 SSID
@@ -192,12 +192,12 @@ StatusRet CREM_OSC::transfer_SSID()
     memset(rx_dma_buffer, 0, TRANSACTION_LENGTH*2);
     start_dma_transfer();
     Pause_us(6000);
-    if(echo_check() == StatusRet::SUCCESS)
+    if(echo_check() == Success)
     {
-      return StatusRet::SUCCESS;
+      return Success;
     }
   }
-  return StatusRet::ERROR;
+  return Error;
 }
 
 // Передача в ESP32 Пароля
@@ -214,12 +214,12 @@ StatusRet CREM_OSC::transfer_Password()
     memset(rx_dma_buffer, 0, TRANSACTION_LENGTH*2);
     start_dma_transfer();
     Pause_us(6000);
-    if(echo_check() == StatusRet::SUCCESS)
+    if(echo_check() == Success)
     {
-      return StatusRet::SUCCESS;
+      return Success;
     }
   }
-  return StatusRet::ERROR;
+  return Error;
 }
 
 // Контроль эха
@@ -229,10 +229,10 @@ StatusRet CREM_OSC::echo_check()
   {
     if(rx_dma_buffer[n] != tx_dma_buffer[n])
     {
-      return StatusRet::ERROR;
+      return Error;
     }
   }
-  return StatusRet::SUCCESS;
+  return Success;
 }
 
 // Упаковка строки

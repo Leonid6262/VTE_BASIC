@@ -43,7 +43,7 @@ StatusRet CSDCard::init()
   }    
   if(i == 1000) 
   {
-    return StatusRet::ERROR;
+    return Error;
   }
   
   sendCommand(CMD2, 0x00000000,   LONG_RESP);   // CMD2 Get CID
@@ -52,9 +52,9 @@ StatusRet CSDCard::init()
   LPC_MCI->POWER = 0x0;                         // Отключаем питание карты 
   if((RCA == 0xFFFF) || (RCA == 0x0000)) 
   {
-    return StatusRet::ERROR;
+    return Error;
   }
-  return StatusRet::SUCCESS;
+  return Success;
   
 }
 

@@ -2863,6 +2863,12 @@
             </file>
         </group>
         <group>
+            <name>DEVICE_DATA</name>
+            <file>
+                <name>$PROJ_DIR$\SRC\DEVICE_DATA\AdcStorage.cpp</name>
+            </file>
+        </group>
+        <group>
             <name>INIT</name>
             <file>
                 <name>$PROJ_DIR$\SRC\INIT\emac.cpp</name>

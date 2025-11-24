@@ -24,7 +24,7 @@ StatusRet CIADC::measure_5V()
     {
       P5_A = 0;
       N5_A = 0;
-      return StatusRet::ERROR;
+      return Error;
     }
   }
   P5_prev = K_P5 * ((LPC_ADC->DR[CH_P5] >> 4) & 0xFFF);
@@ -40,12 +40,12 @@ StatusRet CIADC::measure_5V()
     {
       P5_A = 0;
       N5_A = 0;
-      return StatusRet::ERROR;
+      return Error;
     }
   }  
   N5_prev = (K_N5 * ((LPC_ADC->DR[CH_N5] >> 4) & 0xFFF)) - (3 * P5_A);
   N5_A = (N5_A + N5_prev) / 2.0f;
-  return StatusRet::SUCCESS;
+  return Success;
 }
 
 

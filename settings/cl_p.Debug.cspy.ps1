@@ -23,9 +23,9 @@
 
 if ($debugfile -eq "")
 {
-& "C:\Program Files\IAR Systems\Embedded Workbench 9.0\common\bin\cspybat" -f "E:\S\Programs\IAR9_GIT\VTE_332_10\settings\cl_p.Debug.general.xcl" --backend -f "E:\S\Programs\IAR9_GIT\VTE_332_10\settings\cl_p.Debug.driver.xcl" 
+& "C:\Program Files\IAR Systems\Embedded Workbench 9.0\common\bin\cspybat" -f "C:\Users\Mini S12 Pro\Documents\IAR9\VTE_332_10\settings\cl_p.Debug.general.xcl" --backend -f "C:\Users\Mini S12 Pro\Documents\IAR9\VTE_332_10\settings\cl_p.Debug.driver.xcl" 
 }
 else
 {
-& "C:\Program Files\IAR Systems\Embedded Workbench 9.0\common\bin\cspybat" -f "E:\S\Programs\IAR9_GIT\VTE_332_10\settings\cl_p.Debug.general.xcl" --debug_file=$debugfile --backend -f "E:\S\Programs\IAR9_GIT\VTE_332_10\settings\cl_p.Debug.driver.xcl" 
+& "C:\Program Files\IAR Systems\Embedded Workbench 9.0\common\bin\cspybat" -f "C:\Users\Mini S12 Pro\Documents\IAR9\VTE_332_10\settings\cl_p.Debug.general.xcl" --debug_file=$debugfile --backend -f "C:\Users\Mini S12 Pro\Documents\IAR9\VTE_332_10\settings\cl_p.Debug.driver.xcl" 
 }

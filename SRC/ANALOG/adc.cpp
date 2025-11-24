@@ -1,5 +1,6 @@
 #include "adc.hpp"
 #include "system_LPC177x.h"
+#include "AdcStorage.hpp"
 #include <math.h>
 
 void CADC::conv_tnf(std::initializer_list<char> list)
@@ -35,7 +36,7 @@ void CADC::conv_tnf(std::initializer_list<char> list)
       if (ending_index < 2)
       {
         ending_index++;
-        LPC_SSP1->DR = cN_CH[ch_HRf];
+        LPC_SSP1->DR = cN_CH[CADC_STORAGE::ch_HRf];
         timings[timing_index] = LPC_TIM3->TC;
         timing_index++;
       }
@@ -50,8 +51,10 @@ void CADC::conv_tnf(std::initializer_list<char> list)
         tmp_Nch = (raw_adc_data & 0xF000) >> 12;
         if (tmp_Nch < G_CONST::NUMBER_CHANNELS)
         {
+          
           data[tmp_Nch] = ((raw_adc_data & 0x0FFF) - CEEPSettings::getInstance().getSettings().shift_adc[tmp_Nch]) *
             (1.0f + CEEPSettings::getInstance().getSettings().incline_adc[tmp_Nch]);
+          CADC_STORAGE::getInstance().setExternal(tmp_Nch, data[tmp_Nch]);
         }
         index_rd++;
       }

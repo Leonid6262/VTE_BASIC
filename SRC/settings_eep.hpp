@@ -7,7 +7,8 @@
 // Пространство имён глобальных констант
 namespace G_CONST 
 {
-  constexpr unsigned short NUMBER_CHANNELS = 16;     // Количество какналов АЦП
+  constexpr unsigned short NUMBER_CHANNELS = 16;     // Количество какналов внешнего АЦП
+  constexpr unsigned short NUMBER_I_CHANNELS = 2;    // Количество какналов внутреннего АЦП
   constexpr unsigned short SSID_PS_L = 20;           // Максимальная длина имени и пароля WiFi сети 20 символов
   constexpr unsigned short BYTES_RW_MAX = 3;         // Макс. количество байт чтения/записи по SPI (кол. структур в CSPI_ports)
   constexpr unsigned short BYTES_RW_REAL = 1;        // Фактическое количество байт чтения/записи по SPI (определяется схемой)

@@ -46,7 +46,7 @@ void main(void)
                                                 // В данном случае, допускаем передачу pointer crc16
                                                 // (передать в singleton reference намного сложнее) 
   // Загрузка уставок (RAM <- EEPROM) 
-  if(CEEPSettings::getInstance().loadSettings() != StatusRet::SUCCESS)          
+  if(CEEPSettings::getInstance().loadSettings() != Success)          
   {
    /*  
       Если CRC не сошлись (StatusRet::ERROR), используются уставки по умолчанию.
@@ -91,7 +91,7 @@ void main(void)
   static CSDCard sd_card;       /* Инициализация CD карты. При успешной инициализации, читается RCA карты.
                                    Файловая система не реализована. */
   
-  if(sd_card.init() != StatusRet::SUCCESS)          
+  if(sd_card.init() != Success)          
   {
     /*Вывести сообщение на ПТ: "CD карта не определена!"*/
   }
@@ -100,7 +100,7 @@ void main(void)
                                     UDP или TCR/IP сервер не реализован, но, для обмена типа точка-точка, 
                                     например, контроллер-ноутбук, raw Ethernet кадров достаточно.*/
   
-  if(emac_drv.initEMAC() != StatusRet::SUCCESS)          
+  if(emac_drv.initEMAC() != Success)          
   {
     /*Вывести сообщение на ПТ: "Нет готовности Ethernet!"*/
   }
@@ -126,13 +126,13 @@ void main(void)
   {
     {      
       // Указатели на отображаемые переменные.
-       &adc.data[CADC::ROTOR_CURRENT],         
-       &sifu.rPulsCalc.U_STATORA,                         // Напряжение статора [rms]
-       &sifu.rPulsCalc.I_STATORA,                         // Полный ток статора [rms]
-       &adc.data[CADC::ROTOR_VOLTAGE],            
-       &adc.data[CADC::LEAKAGE_CURRENT],                                                                
-       &adc.data[CADC::LOAD_NODE_CURRENT],
-       &adc.data[CADC::EXTERNAL_SETTINGS]      
+       CADC_STORAGE::getInstance().getExternalPointer(CADC_STORAGE::ROTOR_CURRENT),           
+       &sifu.rPulsCalc.U_STATORA,                                                       // Напряжение статора [rms]
+       &sifu.rPulsCalc.I_STATORA,                                                       // Полный ток статора [rms]
+       CADC_STORAGE::getInstance().getExternalPointer(CADC_STORAGE::ROTOR_VOLTAGE),            
+       CADC_STORAGE::getInstance().getExternalPointer(CADC_STORAGE::LEAKAGE_CURRENT),                                                                
+       CADC_STORAGE::getInstance().getExternalPointer(CADC_STORAGE::LOAD_NODE_CURRENT),
+       CADC_STORAGE::getInstance().getExternalPointer(CADC_STORAGE::EXTERNAL_SETTINGS)      
     },
     {
       // Имена треков (как будут подписаны в ПО ПК)
@@ -201,7 +201,6 @@ void main(void)
     tests,
     dout_cpu,   
     i_adc,   
-    adc,        
     sd_card,
     test_eth,
     rt_clock,

@@ -29,7 +29,6 @@ public:
     CTESTS&     rTs;
     CDout_cpu&  rDout_cpu;
     CIADC&      rI_adc;
-    CADC&       rADC;
     CSDCard&    rSD_card;
     CTEST_ETH&  rTest_eth;
     CRTC&       rRt_clock;

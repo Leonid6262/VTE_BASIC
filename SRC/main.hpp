@@ -10,6 +10,7 @@
 #include "settings_eep.hpp"
 #include "adc.hpp"
 #include "i_adc.hpp"
+#include "AdcStorage.hpp"
 #include "Compare.hpp"
 #include "uart.hpp"
 #include "can.hpp"

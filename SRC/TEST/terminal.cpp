@@ -1,4 +1,5 @@
 #include "terminal.hpp"
+#include "AdcStorage.hpp"
 
 const char* CTerminal::header_str[] = {
     "\r\nDate and Time   \r\n",
@@ -259,37 +260,37 @@ void CTerminal::terminal()
     break;  
     
   case 12:     
-    sprintf(formVar, "%5d     \r", deps.rADC.data[CADC::ROTOR_CURRENT]);
+    sprintf(formVar, "%5d     \r", CADC_STORAGE::getInstance().getExternal(CADC_STORAGE::ROTOR_CURRENT));
     deps.rComPort.transfer_string(formVar);
     break;
     
   case 13:     
-    sprintf(formVar, "%5d     \r", deps.rADC.data[CADC::STATOR_VOLTAGE]);
+    sprintf(formVar, "%5d     \r", CADC_STORAGE::getInstance().getExternal(CADC_STORAGE::STATOR_VOLTAGE));
     deps.rComPort.transfer_string(formVar);
     break;
     
   case 14:     
-    sprintf(formVar, "%5d     \r", deps.rADC.data[CADC::ROTOR_VOLTAGE]);
+    sprintf(formVar, "%5d     \r", CADC_STORAGE::getInstance().getExternal(CADC_STORAGE::ROTOR_VOLTAGE));
     deps.rComPort.transfer_string(formVar);
     break;
     
   case 15:     
-    sprintf(formVar, "%5d     \r", deps.rADC.data[CADC::LEAKAGE_CURRENT]);
+    sprintf(formVar, "%5d     \r", CADC_STORAGE::getInstance().getExternal(CADC_STORAGE::LEAKAGE_CURRENT));
     deps.rComPort.transfer_string(formVar);
     break;
     
   case 16:     
-    sprintf(formVar, "%5d     \r", deps.rADC.data[CADC::STATOR_CURRENT]);
+    sprintf(formVar, "%5d     \r", CADC_STORAGE::getInstance().getExternal(CADC_STORAGE::STATOR_CURRENT));
     deps.rComPort.transfer_string(formVar);
     break;
     
   case 17:     
-    sprintf(formVar, "%5d     \r", deps.rADC.data[CADC::LOAD_NODE_CURRENT]);
+    sprintf(formVar, "%5d     \r", CADC_STORAGE::getInstance().getExternal(CADC_STORAGE::LOAD_NODE_CURRENT));
     deps.rComPort.transfer_string(formVar);
     break;
     
   case 18:     
-    sprintf(formVar, "%5d     \r", deps.rADC.data[CADC::EXTERNAL_SETTINGS]);
+    sprintf(formVar, "%5d     \r", CADC_STORAGE::getInstance().getExternal(CADC_STORAGE::EXTERNAL_SETTINGS));
     deps.rComPort.transfer_string(formVar);
     break;
     

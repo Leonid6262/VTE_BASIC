@@ -348,6 +348,7 @@
                     <state>$PROJ_DIR$\SRC\TEST\</state>
                     <state>$PROJ_DIR$\SRC\PULSES\</state>
                     <state>$PROJ_DIR$\SRC\SERIAL\</state>
+                    <state>$PROJ_DIR$\SRC\DEVICE_DATA\</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -2138,6 +2139,12 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\SRC\ANALOG\i_adc.cpp</name>
+            </file>
+        </group>
+        <group>
+            <name>DEVICE_DATA</name>
+            <file>
+                <name>$PROJ_DIR$\SRC\DEVICE_DATA\AdcStorage.cpp</name>
             </file>
         </group>
         <group>
