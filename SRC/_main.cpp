@@ -121,45 +121,8 @@ void main(void)
   static CSIFU sifu(puls_calc); /* Классическое, компактное СИФУ, на одном таймере.
                                    Handler синхронизации не используется. */                                                 
                                 
-  // Пример структуры инициализирующих значений CREM_OSC. Дистанционный осцилограф (ESP32 c WiFi модулем)
-  static CREM_OSC::SSET_init set_init
-  {
-    {      
-      // Указатели на отображаемые переменные.
-       CADC_STORAGE::getInstance().getExternalPointer(CADC_STORAGE::ROTOR_CURRENT),           
-       &sifu.rPulsCalc.U_STATORA,                                                       // Напряжение статора [rms]
-       &sifu.rPulsCalc.I_STATORA,                                                       // Полный ток статора [rms]
-       CADC_STORAGE::getInstance().getExternalPointer(CADC_STORAGE::ROTOR_VOLTAGE),            
-       CADC_STORAGE::getInstance().getExternalPointer(CADC_STORAGE::LEAKAGE_CURRENT),                                                                
-       CADC_STORAGE::getInstance().getExternalPointer(CADC_STORAGE::LOAD_NODE_CURRENT),
-       CADC_STORAGE::getInstance().getExternalPointer(CADC_STORAGE::EXTERNAL_SETTINGS)      
-    },
-    {
-      // Имена треков (как будут подписаны в ПО ПК)
-      "I_ROT","USTAT","ISTAT","U_ROT","I_LEK","I_NOD","E_SET"
-    },
-    {
-      // Уставки коэффициентов отображения (дискрет на 100%)
-      CEEPSettings::getInstance().getSettings().disp_c.p_i_rotor, 
-      CEEPSettings::getInstance().getSettings().disp_c.p_ustat_rms,
-      CEEPSettings::getInstance().getSettings().disp_c.p_istat_rms,
-      CEEPSettings::getInstance().getSettings().disp_c.p_u_rotor,
-      CEEPSettings::getInstance().getSettings().disp_c.p_i_leak,
-      CEEPSettings::getInstance().getSettings().disp_c.p_i_node,
-      CEEPSettings::getInstance().getSettings().disp_c.p_e_set
-      // Количество треков определяется по ёмкости этого массива (d_100p) 
-    },
-    // Режим работы Access_point или Station
-    CREM_OSC::Operating_mode::Access_point,
-    // Серийный номер платы контроллера (задаётся для режима Access_point)
-    CEEPSettings::getInstance().getSettings().SNboard_number,
-    // Имя сети и пароль (задаются для режима Station)
-    /* Как задавать ssid и password пока не ясно. При отсутствии панели оператора
-       и сетевых интерфейсов, возможно с ноутбука. Задавать с ПТ удовольствие так себе.*/
-    CEEPSettings::getInstance().getSettings().ssid,
-    CEEPSettings::getInstance().getSettings().password 
-  };
-  static CREM_OSC rem_osc(cont_dma, set_init);  /* Дистанционный осциллограф (ESP32 c WiFi модулем).
+
+  static CREM_OSC rem_osc(cont_dma, puls_calc); /* Дистанционный осциллограф (ESP32 c WiFi модулем).
                                                    Карту каналов DMA с.м. в controllerDMA.hpp 
                                                    Передача данных (метод send_data()) осуществляется в точке, 
                                                    где отображаемые переменные обновлены, например в IRQ ИУ. 

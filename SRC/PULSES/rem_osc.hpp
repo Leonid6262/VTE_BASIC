@@ -2,6 +2,7 @@
 
 #include "spi_init.hpp"
 #include "controllerDMA.hpp"
+#include "conv_and_calc.hpp"
 #include "bool_name.hpp"
 #include <vector>
 
@@ -71,16 +72,17 @@ public:
   // Структура инициализирующих значений
   struct SSET_init {
     signed short* pData[NUMBER_TRACKS];
-    const char Names[NUMBER_TRACKS][NAME_LENGTH];
+    char Names[NUMBER_TRACKS][NAME_LENGTH];
     unsigned short d_100p[NUMBER_TRACKS];
     Operating_mode mode;
     unsigned short SNboard_number;
     unsigned char* pSSID;
     unsigned char* pPassword;
   };
-  SSET_init& set_init;
-  
-  CREM_OSC(CDMAcontroller&, SSET_init&);
+
+  SSET_init set_init;
+  CREM_OSC(CDMAcontroller&, CPULSCALC&);
+  CPULSCALC& rPulsCalc;
   
   static signed short tx_dma_buffer[TRANSACTION_LENGTH];
   static signed short rx_dma_buffer[TRANSACTION_LENGTH];

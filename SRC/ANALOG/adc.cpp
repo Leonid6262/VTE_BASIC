@@ -58,10 +58,7 @@ void CADC::conv_tnf(std::initializer_list<char> list)
     }
 
     // Все байты записаны и прочитаны
-    if ((index_wr == N_ch) && (index_rd == (N_ch + 2)) && (ending_index == 2))
-    {
-      break;
-    }
+    if ((index_wr == N_ch) && (index_rd == (N_ch + 2)) && (ending_index == 2)) break;
   }
 
   // Контрольная очистка FIFO
