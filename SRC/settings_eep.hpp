@@ -10,7 +10,7 @@ namespace G_CONST
   constexpr unsigned short NUMBER_CHANNELS = 16;     // Количество какналов внешнего АЦП
   constexpr unsigned short NUMBER_I_CHANNELS = 2;    // Количество какналов внутреннего АЦП
   constexpr unsigned short SSID_PS_L = 20;           // Максимальная длина имени и пароля WiFi сети 20 символов
-  constexpr unsigned short BYTES_RW_MAX = 3;         // Макс. количество байт чтения/записи по SPI (кол. структур в CSPI_ports)
+  constexpr unsigned short BYTES_RW_MAX = 3;         // Макс. количество байт чтения/записи по SPI (кол. структур данных)
   constexpr unsigned short BYTES_RW_REAL = 1;        // Фактическое количество байт чтения/записи по SPI (определяется схемой)
 }
 
@@ -51,14 +51,12 @@ private:
       unsigned short p_var10;
       float          c_var10;
     } disp_c;
-    unsigned char din_Pi0_invert;                               // 7 Признак инвертирования входов порта Pi0
-    unsigned char din_Pi1_invert;                               // 8 Признак инвертирования входов порта Pi1
-    unsigned char din_spi_invert[G_CONST::BYTES_RW_MAX];        // 9 Признак инвертирования SPI входов 
-    unsigned char dout_spi_invert[G_CONST::BYTES_RW_MAX];       //10 Признак инвертирования SPI выходов
-    signed short  power_shift;                                  //11 Точный сдвиг силового напряжения
-    unsigned char d_power_shift;                                //12 Дискретный сдвиг силового напряжения 60гр
-    unsigned char ssid[G_CONST::SSID_PS_L];                     //13 Имя сети
-    unsigned char password[G_CONST::SSID_PS_L];                 //14 Пароль
+    unsigned char din_Pi_invert[G_CONST::BYTES_RW_MAX + 1];  // 7 Признак инвертирования дискретных входов (+1 - порт Pi0)
+    unsigned char dout_spi_invert[G_CONST::BYTES_RW_MAX];    // 8 Признак инвертирования SPI выходов
+    signed short  power_shift;                               // 9 Точный сдвиг силового напряжения
+    unsigned char d_power_shift;                             //10 Дискретный сдвиг силового напряжения 60гр
+    unsigned char ssid[G_CONST::SSID_PS_L];                  //11 Имя сети
+    unsigned char password[G_CONST::SSID_PS_L];              //12 Пароль
     // Добавляя новые уставки сюда, не забывайте обновлять defaultSettings ниже!!!
   };
   
@@ -105,9 +103,7 @@ private:
       .p_var10 = 100,
       .c_var10 = 0.5f  
     },
-    .din_Pi0_invert = 0,
-    .din_Pi1_invert = 0,
-    .din_spi_invert =  { 0,0,0 },
+    .din_Pi_invert = {0,0,0,0},  
     .dout_spi_invert = { 0,0,0 },
     .power_shift = 0,
     .d_power_shift = 0,

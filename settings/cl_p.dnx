@@ -12,7 +12,7 @@
         <ByteLimit>50</ByteLimit>
     </Stack>
     <DebugChecksum>
-        <Checksum>500750143</Checksum>
+        <Checksum>1290011846</Checksum>
     </DebugChecksum>
     <CodeCoverage>
         <Enabled>_ 0</Enabled>
@@ -156,6 +156,11 @@
         <FreqHi>0</FreqHi>
         <MultiCoreRunAll>1</MultiCoreRunAll>
     </Simulator>
+    <LogFile>
+        <LoggingEnabled>_ 0</LoggingEnabled>
+        <LogFile>_ "$PROJ_DIR$\LogFile1.log"</LogFile>
+        <Category2>_ 2</Category2>
+    </LogFile>
     <struct_types>
         <Fmt0>LPC_CAN_TypeDef-BTR	3	0</Fmt0>
         <Fmt1>LPC_CAN_TypeDef-GSR	1	0</Fmt1>
@@ -172,6 +177,8 @@
         <Fmt12>struct CSIFU::SyncState-cur_power_shift	3	0</Fmt12>
         <Fmt13>struct CSIFU::SyncState-d_power_shift	3	0</Fmt13>
         <Fmt14>struct CSIFU::SyncState-task_power_shift	3	0</Fmt14>
+        <Fmt15>union CDIN_STORAGE::&lt;Unnamed 1&gt;-all	1	0</Fmt15>
+        <Fmt16>union CSPI_ports::&lt;Unnamed 1&gt;-all	1	0</Fmt16>
     </struct_types>
     <array_types>
         <Fmt0>byte[8]	3	0</Fmt0>
@@ -287,64 +294,77 @@
         <Fmt81>{W}42:dc1	1	0</Fmt81>
         <Fmt82>{W}42:dc2	1	0</Fmt82>
         <Fmt83>{W}42:ddf_seconds	4	0</Fmt83>
-        <Fmt84>{W}42:din_spi5	1	0</Fmt84>
-        <Fmt85>{W}42:dt1	3	0</Fmt85>
-        <Fmt86>{W}42:dto	4	0</Fmt86>
-        <Fmt87>{W}42:dtt	3	0</Fmt87>
-        <Fmt88>{W}42:emcx	4	0</Fmt88>
-        <Fmt89>{W}42:formFI[4]	3	0</Fmt89>
-        <Fmt90>{W}42:gpo	1	0</Fmt90>
-        <Fmt91>{W}42:hour	3	0</Fmt91>
-        <Fmt92>{W}42:id	4	0</Fmt92>
-        <Fmt93>{W}42:inDR	1	0</Fmt93>
-        <Fmt94>{W}42:min	3	0</Fmt94>
-        <Fmt95>{W}42:month	3	0</Fmt95>
-        <Fmt96>{W}42:nP	3	0</Fmt96>
-        <Fmt97>{W}42:nc	4	0</Fmt97>
-        <Fmt98>{W}42:nch1	4	0</Fmt98>
-        <Fmt99>{W}42:prev_T1	4	0</Fmt99>
-        <Fmt100>{W}42:reg_position	1	0</Fmt100>
-        <Fmt101>{W}42:result	1	0</Fmt101>
-        <Fmt102>{W}42:rtc_hours	3	0</Fmt102>
-        <Fmt103>{W}42:rtc_minutes	3	0</Fmt103>
-        <Fmt104>{W}42:rtc_seconds	3	0</Fmt104>
-        <Fmt105>{W}42:rtc_years	3	0</Fmt105>
-        <Fmt106>{W}42:s	3	0</Fmt106>
-        <Fmt107>{W}42:sTime	0	9</Fmt107>
-        <Fmt108>{W}42:s_year	3	0</Fmt108>
-        <Fmt109>{W}42:sec	3	0</Fmt109>
-        <Fmt110>{W}42:size_svar	3	0</Fmt110>
-        <Fmt111>{W}42:sizeof(SettingsVar)	3	0</Fmt111>
-        <Fmt112>{W}42:sizeof(set.svar)	3	0</Fmt112>
-        <Fmt113>{W}42:sizeof(svar)	3	0</Fmt113>
-        <Fmt114>{W}42:sizeof(svar_f)	3	0</Fmt114>
-        <Fmt115>{W}42:t	3	0</Fmt115>
-        <Fmt116>{W}42:t_PIN	1	0</Fmt116>
-        <Fmt117>{W}42:t_bPin	1	0</Fmt117>
-        <Fmt118>{W}42:tc	4	0</Fmt118>
-        <Fmt119>{W}42:tf_can	1	0</Fmt119>
-        <Fmt120>{W}42:ti_can	3	0</Fmt120>
-        <Fmt121>{W}42:tim0_data	3	0</Fmt121>
-        <Fmt122>{W}42:time_diff	3	0</Fmt122>
-        <Fmt123>{W}42:tm	4	0</Fmt123>
-        <Fmt124>{W}42:tmp	1	0</Fmt124>
-        <Fmt125>{W}42:tmp1	1	0</Fmt125>
-        <Fmt126>{W}42:tmp2	3	0</Fmt126>
-        <Fmt127>{W}42:tmp3	3	0</Fmt127>
-        <Fmt128>{W}42:tmp4	3	0</Fmt128>
-        <Fmt129>{W}42:tmp5	3	0</Fmt129>
-        <Fmt130>{W}42:tmp6	3	0</Fmt130>
-        <Fmt131>{W}42:tmp7	3	0</Fmt131>
-        <Fmt132>{W}42:year	3	0</Fmt132>
+        <Fmt84>{W}42:din	1	0</Fmt84>
+        <Fmt85>{W}42:din_spi5	1	0</Fmt85>
+        <Fmt86>{W}42:dt1	3	0</Fmt86>
+        <Fmt87>{W}42:dto	4	0</Fmt87>
+        <Fmt88>{W}42:dtt	3	0</Fmt88>
+        <Fmt89>{W}42:emcx	4	0</Fmt89>
+        <Fmt90>{W}42:formFI[4]	3	0</Fmt90>
+        <Fmt91>{W}42:gpo	1	0</Fmt91>
+        <Fmt92>{W}42:hour	3	0</Fmt92>
+        <Fmt93>{W}42:id	4	0</Fmt93>
+        <Fmt94>{W}42:inDR	1	0</Fmt94>
+        <Fmt95>{W}42:min	3	0</Fmt95>
+        <Fmt96>{W}42:month	3	0</Fmt96>
+        <Fmt97>{W}42:nP	3	0</Fmt97>
+        <Fmt98>{W}42:nc	4	0</Fmt98>
+        <Fmt99>{W}42:nch1	4	0</Fmt99>
+        <Fmt100>{W}42:prev_T1	4	0</Fmt100>
+        <Fmt101>{W}42:reg_position	1	0</Fmt101>
+        <Fmt102>{W}42:result	1	0</Fmt102>
+        <Fmt103>{W}42:rtc_hours	3	0</Fmt103>
+        <Fmt104>{W}42:rtc_minutes	3	0</Fmt104>
+        <Fmt105>{W}42:rtc_seconds	3	0</Fmt105>
+        <Fmt106>{W}42:rtc_years	3	0</Fmt106>
+        <Fmt107>{W}42:s	3	0</Fmt107>
+        <Fmt108>{W}42:sTime	0	9</Fmt108>
+        <Fmt109>{W}42:s_year	3	0</Fmt109>
+        <Fmt110>{W}42:sec	3	0</Fmt110>
+        <Fmt111>{W}42:size_svar	3	0</Fmt111>
+        <Fmt112>{W}42:sizeof(SettingsVar)	3	0</Fmt112>
+        <Fmt113>{W}42:sizeof(set.svar)	3	0</Fmt113>
+        <Fmt114>{W}42:sizeof(svar)	3	0</Fmt114>
+        <Fmt115>{W}42:sizeof(svar_f)	3	0</Fmt115>
+        <Fmt116>{W}42:t	3	0</Fmt116>
+        <Fmt117>{W}42:t_PIN	1	0</Fmt117>
+        <Fmt118>{W}42:t_bPin	1	0</Fmt118>
+        <Fmt119>{W}42:tc	4	0</Fmt119>
+        <Fmt120>{W}42:tf_can	1	0</Fmt120>
+        <Fmt121>{W}42:ti_can	3	0</Fmt121>
+        <Fmt122>{W}42:tim0_data	3	0</Fmt122>
+        <Fmt123>{W}42:time_diff	3	0</Fmt123>
+        <Fmt124>{W}42:tm	4	0</Fmt124>
+        <Fmt125>{W}42:tmp	1	0</Fmt125>
+        <Fmt126>{W}42:tmp1	1	0</Fmt126>
+        <Fmt127>{W}42:tmp2	3	0</Fmt127>
+        <Fmt128>{W}42:tmp3	3	0</Fmt128>
+        <Fmt129>{W}42:tmp4	3	0</Fmt129>
+        <Fmt130>{W}42:tmp5	3	0</Fmt130>
+        <Fmt131>{W}42:tmp6	3	0</Fmt131>
+        <Fmt132>{W}42:tmp7	3	0</Fmt132>
+        <Fmt133>{W}42:year	3	0</Fmt133>
     </watch_formats>
     <Trace2>
         <Enabled>0</Enabled>
         <ShowSource>0</ShowSource>
     </Trace2>
+    <DisassembleMode>
+        <mode>0</mode>
+    </DisassembleMode>
+    <Breakpoints2>
+        <Count>0</Count>
+    </Breakpoints2>
     <TermIOLog>
         <LoggingEnabled>_ 0</LoggingEnabled>
         <LogFile>_ ""</LogFile>
     </TermIOLog>
+    <Aliases>
+        <A0>_ "G:\S\Programs\IAR_N\SPI_WIFI_2\SRC\INIT\emc.c" ""</A0>
+        <A1>_ "G:\S\Programs\IAR_N\SPI_WIFI_2\SRC\main.cpp" ""</A1>
+        <Count>2</Count>
+        <SuppressDialog>0</SuppressDialog>
+    </Aliases>
     <DriverProfiling>
         <Enabled>0</Enabled>
         <Mode>1</Mode>
@@ -357,21 +377,4 @@
     <CallStackStripe>
         <ShowTiming>1</ShowTiming>
     </CallStackStripe>
-    <LogFile>
-        <LoggingEnabled>_ 0</LoggingEnabled>
-        <LogFile>_ "$PROJ_DIR$\LogFile1.log"</LogFile>
-        <Category2>_ 2</Category2>
-    </LogFile>
-    <DisassembleMode>
-        <mode>0</mode>
-    </DisassembleMode>
-    <Breakpoints2>
-        <Count>0</Count>
-    </Breakpoints2>
-    <Aliases>
-        <A0>_ "G:\S\Programs\IAR_N\SPI_WIFI_2\SRC\INIT\emc.c" ""</A0>
-        <A1>_ "G:\S\Programs\IAR_N\SPI_WIFI_2\SRC\main.cpp" ""</A1>
-        <Count>2</Count>
-        <SuppressDialog>0</SuppressDialog>
-    </Aliases>
 </settings>

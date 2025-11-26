@@ -79,13 +79,13 @@ void main(void)
   static CADC adc;              // Внешнее ADC.
   
   static CSPI_ports spi_ports;  // Дискретные входы и выходы доступные по SPI. Примеры доступа: 
-                                //      if(rSpi_ports.Stator_Key()){...}
-                                //      rSpi_ports.Lamp_REDY(ON);
-  
+                                //      if(s_instans.Stator_Key()){...}
+                                //      s_instans.Lamp_REDY(ON);
+
   static CDin_cpu din_cpu;      // Дискретные входы контроллера (порты Pi0 и Pi1 по аналогии с СМ3)
   static CDout_cpu dout_cpu;    // Дискретные выходы контроллера (порт Po0 по аналогии с СМ3)
                                 // Примеры доступа:
-                                //      if(rDin_cpu.Setting_More()){...}
+                                //      if(s_instans.Setting_More()){...}
                                 //      rDout_cpu.REL_LEAKAGE_P(OFF);
     
   static CSDCard sd_card;       /* Инициализация CD карты. При успешной инициализации, читается RCA карты.
@@ -176,7 +176,8 @@ void main(void)
   
   static auto& settings = CEEPSettings::getInstance().getSettings();    // Тестовые отладочный указатели. 
   static auto& data_e_adc = CADC_STORAGE::getInstance().getExternal();  // В production не используются
-    
+  static CDIN_STORAGE& din_instans = CDIN_STORAGE::getInstance();  
+
   while(true)
   {        
     settings = CEEPSettings::getInstance().getSettings();

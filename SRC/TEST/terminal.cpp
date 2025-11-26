@@ -116,13 +116,13 @@ void CTerminal::terminal()
     deps.rComPort.transfer_string(formVar);
     break;
   case 1:     
-    char_to_bits(data_port_input, deps.rDin_cpu.UData_din_f_Pi0.all);
+    char_to_bits(data_port_input, deps.rDin_cpu.data_din_Pi0);
     sprintf(formVar, "%s\r", data_port_input);    
     deps.rComPort.transfer_string(formVar);
     break;
     
   case 2: 
-    char_to_bits(data_port_input, deps.rDin_cpu.UData_din_Pi1.all);
+    char_to_bits(data_port_input, deps.rDin_cpu.data_din_Pi1);
     sprintf(formVar, "%s\r", data_port_input);
     deps.rComPort.transfer_string(formVar);
     break;
@@ -131,7 +131,7 @@ void CTerminal::terminal()
     char_to_bits
       (
        data_port_input, 
-       deps.rSpi_ports.UData_din_f[static_cast<char>(CSPI_ports::EBytesDinNumber::BYTE_DIN_CPU)].all
+       deps.rSpi_ports.data_din[0]
          );
     sprintf(formVar, "%s\r", data_port_input);
     deps.rComPort.transfer_string(formVar);

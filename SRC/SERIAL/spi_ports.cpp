@@ -1,16 +1,8 @@
 #include "spi_ports.hpp"
 #include "spi_init.hpp"
+#include "dIOStorage.hpp"
 #include "system_LPC177x.h"
 
-// Постоянные времени интегрирования фильтра (ms первый множитель) din портов. 
-// TIC_ms = 10000 дискрет таймера на 1ms.  
-// То есть, 50*TIC_ms = 50ms, 0*TIC_ms - нет фильтрации, и т.п. 
-const unsigned int CSPI_ports::const_integr_spi[G_CONST::BYTES_RW_MAX][N_BITS] = 
-{
-  {50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms}, // Контроллер
-  {50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms}, // S600 - байт-0
-  {50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms}  // S600 - байт-1
-};
 
 void CSPI_ports::rw() 
 {  
@@ -18,48 +10,25 @@ void CSPI_ports::rw()
   prev_TC0 = LPC_TIM0->TC;
   
   auto& settings = CEEPSettings::getInstance().getSettings();
+  CDIN_STORAGE& s_instans = CDIN_STORAGE::getInstance();
+  
+  unsigned char n_for_storage = static_cast<unsigned char>(CDIN_STORAGE::EIBNumber::CPU_SPI);  
   
   for(char byte = 0; byte < G_CONST::BYTES_RW_REAL; byte++) 
   {
     //Запись в dout с учётом инверсии
-    LPC_SSP0->DR = UData_dout[byte + (G_CONST::BYTES_RW_MAX - G_CONST::BYTES_RW_REAL)].all 
-      ^ settings.dout_spi_invert[byte + (G_CONST::BYTES_RW_MAX - G_CONST::BYTES_RW_REAL)]; 
+    LPC_SSP0->DR = 
+      s_instans.UData_dout[byte + (G_CONST::BYTES_RW_MAX - G_CONST::BYTES_RW_REAL)].all 
+        ^ settings.dout_spi_invert[byte + (G_CONST::BYTES_RW_MAX - G_CONST::BYTES_RW_REAL)];     
     
-    //data_din_invert - входные данные (предыдущего цикла r/w) din портов  с учётом инверсии
-    unsigned char data_din_invert = data_din[byte] ^ settings.din_spi_invert[byte];
-    
-    //Фильтр 8-ми бит
-    for(char b = 0; b < N_BITS; b++){      
-      if(data_din_invert & (1UL << b))
-      {           
-        //Если на входе 1
-        integrator[byte][b] += dT;
-        if(integrator[byte][b] >= const_integr_spi[byte][b])
-        { 
-          //Если интегратор в насыщении, на выходе 1
-          integrator[byte][b] = const_integr_spi[byte][b];
-          UData_din_f[byte].all |= (1UL << b);
-        }
-      }
-      else
-      {
-        //Если на входе 0
-        integrator[byte][b] -= dT;
-        if(integrator[byte][b] <= 0)
-        { 
-          //Если интегратор в нуле, на выходе 0
-          integrator[byte][b] = 0;
-          UData_din_f[byte].all &= ~(1UL << b);       
-        }
-      }       
-    }
-    
+    // Фильтр (интегратор входного сигнала) и фиксация в CDIN_STORAGE
+    CDIN_STORAGE::getInstance().filter(data_din[byte], dT, n_for_storage + byte);
+
     // После окончание операции r/w считываем байт din порта.
     // учитывая, что процесс фильтрации происходит на фоне транзакции spi,ожидания 
     // при частотах spi до 900 кГц в while (LPC_SSP0->SR & SR_BSY){} - не происходит
     while (LPC_SSP0->SR & SPI_Config::SR_BSY){}
-    data_din[byte] = ~LPC_SSP0->DR;
-    
+    data_din[byte] = ~LPC_SSP0->DR;    
   } 
   
   //Захват din и обновление dout (1->0->1 HOLD bit).
@@ -82,14 +51,10 @@ CSPI_ports::CSPI_ports()
   SPI_Config::set_spi_clock(LPC_SSP0, Hz_SPI, PeripheralClock );
   LPC_SSP0->CR1 |= SPI_Config::CR1_SSP_EN; 
 
-  // Обнуление случайных значений в выходных регистрах и сброс интеграторов.
+  // Обнуление случайных значений в выходных регистрах.
   for(char byte = 0; byte < G_CONST::BYTES_RW_MAX; byte++) 
   {
-    UData_dout[byte].all = 0;
-    for(char b = 0; b < N_BITS; b++) 
-    {      
-      integrator[byte][b] = 0;
-    }
+    CDIN_STORAGE::getInstance().UData_dout[byte].all = 0;
   }    
   rw();
   // Активизация выходных регистров (перевод из 3-го состояния в активное)
