@@ -2,6 +2,7 @@
 
 #include "handlers_IRQ.hpp"
 #include "controllerDMA.hpp"
+#include "spi.hpp"
 #include "spi_ports.hpp"
 #include "Ports_init.hpp"
 #include "emc.hpp"

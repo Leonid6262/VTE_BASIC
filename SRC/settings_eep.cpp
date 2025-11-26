@@ -20,13 +20,13 @@ CEEPSettings& CEEPSettings::getInstance()
 StatusRet CEEPSettings::loadSettings() 
 {
   WorkSettings tempSettings; 
-  if (readFromEEPInternal(tempSettings) == Success) 
+  if (readFromEEPInternal(tempSettings) == StatusRet::SUCCESS) 
   {
     settings = tempSettings; // CRC - Ok, копируем вместо дефолтныхг
-    return Success;
+    return StatusRet::SUCCESS;
   }
   // В settings остаются дефолтные!
-  return Error;
+  return StatusRet::ERROR;
 }
 
 // Функция чтения из EEP в структуру уставок
@@ -39,9 +39,9 @@ StatusRet CEEPSettings::readFromEEPInternal(WorkSettings& outSettings)
        );
   if(chs_tmp != outSettings.checkSum)
   { 
-    return Error; // CRC - ERROR
+    return StatusRet::ERROR; // CRC - ERROR
   }
-  return Success; // CRC - Ok
+  return StatusRet::SUCCESS; // CRC - Ok
 }
 
 // Запись уставок

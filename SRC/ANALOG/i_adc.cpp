@@ -27,7 +27,7 @@ StatusRet CIADC::measure_5V()
     {
       pStorage.setInternal(CADC_STORAGE::EIADC_NameCh::SUPPLY_P5, 0);
       pStorage.setInternal(CADC_STORAGE::EIADC_NameCh::SUPPLY_N5, 0);
-      return Error;
+      return StatusRet::ERROR;
     }
   }
   P5_prev = K_P5 * ((LPC_ADC->DR[CH_P5] >> 4) & 0xFFF);
@@ -45,14 +45,14 @@ StatusRet CIADC::measure_5V()
     {
       pStorage.setInternal(CADC_STORAGE::EIADC_NameCh::SUPPLY_P5, 0);
       pStorage.setInternal(CADC_STORAGE::EIADC_NameCh::SUPPLY_N5, 0);
-      return Error;
+      return StatusRet::ERROR;
     }
   }  
   N5_prev = (K_N5 * ((LPC_ADC->DR[CH_N5] >> 4) & 0xFFF)) - (3 * P5_A);
   float N5_A = pStorage.getInternal(CADC_STORAGE::EIADC_NameCh::SUPPLY_N5);
   N5_A = (N5_A + N5_prev) / 2.0f;
   pStorage.setInternal(CADC_STORAGE::EIADC_NameCh::SUPPLY_N5, N5_A);
-  return Success;
+  return StatusRet::SUCCESS;
 }
 
 

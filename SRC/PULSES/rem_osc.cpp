@@ -196,7 +196,7 @@ void CREM_OSC::transfer_mode()
     break;
   case Operating_mode::Station:
     Ret = transfer_SSID();
-    if(Ret == Success)
+    if(Ret == StatusRet::SUCCESS)
     {
       Ret = transfer_Password();
     }    
@@ -225,11 +225,11 @@ StatusRet CREM_OSC::transfer_SN_ID()
     start_dma_transfer();
     Pause_us(6000);    
   }
-  if(echo_check() == Success)
+  if(echo_check() == StatusRet::SUCCESS)
   {
-    return Success;
+    return StatusRet::SUCCESS;
   }
-  return Error;
+  return StatusRet::ERROR;
 }
 
 // Передача в ESP32 SSID
@@ -246,12 +246,12 @@ StatusRet CREM_OSC::transfer_SSID()
     memset(rx_dma_buffer, 0, TRANSACTION_LENGTH*2);
     start_dma_transfer();
     Pause_us(6000);
-    if(echo_check() == Success)
+    if(echo_check() == StatusRet::SUCCESS)
     {
-      return Success;
+      return StatusRet::SUCCESS;
     }
   }
-  return Error;
+  return StatusRet::ERROR;
 }
 
 // Передача в ESP32 Пароля
@@ -268,12 +268,12 @@ StatusRet CREM_OSC::transfer_Password()
     memset(rx_dma_buffer, 0, TRANSACTION_LENGTH*2);
     start_dma_transfer();
     Pause_us(6000);
-    if(echo_check() == Success)
+    if(echo_check() == StatusRet::SUCCESS)
     {
-      return Success;
+      return StatusRet::SUCCESS;
     }
   }
-  return Error;
+  return StatusRet::ERROR;
 }
 
 // Контроль эха
@@ -283,10 +283,10 @@ StatusRet CREM_OSC::echo_check()
   {
     if(rx_dma_buffer[n] != tx_dma_buffer[n])
     {
-      return Error;
+      return StatusRet::ERROR;
     }
   }
-  return Success;
+  return StatusRet::SUCCESS;
 }
 
 // Упаковка строки
@@ -303,18 +303,13 @@ void CREM_OSC::pack_chars(unsigned char* str)
 
 // Инициализация SPI
 void CREM_OSC::init_SPI()
-{
-  LPC_IOCON->P5_0  = IOCON_SPI;       //MOSI
-  LPC_IOCON->P5_1  = IOCON_SPI;       //MISO
-  LPC_IOCON->P5_2  = IOCON_SPI;       //SCK 
-  LPC_IOCON->P1_27 = IOCON_PORT;      //Резервный вход/выход
-  
+{  
+  LPC_IOCON->P1_27 = IOCON_PORT;      //Резервный вход/выход 
   LPC_IOCON->P5_3 = IOCON_PORT;       //Програмный CS  
   LPC_GPIO5->DIR |= PROG_CS;
   LPC_GPIO5->CLR  = PROG_CS;
   
   // Используется SPI-2
-  LPC_SC->PCONP |= CLKPWR_PCONP_PCSSP2;
   LPC_SSP2->CR0 = 0;
   LPC_SSP2->CR0 = SPI_Config::CR0_DSS(bits_tr);// | CR0_FRF_SPI;  | CR0_CPOL_HI; | CR0_CPHA_SECOND; 
   LPC_SSP2->CR1 = 0;

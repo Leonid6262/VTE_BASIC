@@ -1,10 +1,10 @@
 #pragma once
 
-typedef enum 
+enum class StatusRet 
 {
-  Error = 0,  
-  Success = 1  
-}StatusRet;
+  ERROR = 0,  
+  SUCCESS = 1  
+};
 
 enum Bit_switch 
 { 

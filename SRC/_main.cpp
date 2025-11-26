@@ -46,7 +46,7 @@ void main(void)
                                                 // В данном случае, допускаем передачу pointer crc16
                                                 // (передать в singleton reference намного сложнее) 
   // Загрузка уставок (RAM <- EEPROM) 
-  if(CEEPSettings::getInstance().loadSettings() != Success)          
+  if(CEEPSettings::getInstance().loadSettings() != StatusRet::SUCCESS)          
   {
    /*  
       Если CRC не сошлись (StatusRet::ERROR), используются уставки по умолчанию.
@@ -67,6 +67,10 @@ void main(void)
   static CUART COM_Port(CUART::EUartInstance::UART_TERMINAL);       // COM Port (uart0 - Terminal)
   static CUART RS485_01(CUART::EUartInstance::UART_RS485_01);       // RS485-1 (uart2)
   static CUART RS485_02(CUART::EUartInstance::UART_RS485_02);       // RS485-2 (uart3)
+  
+  static CSPI ports(CSPI::ESPIInstance::SPI_PORTS);                 // SPI-0 - порты ввода/вывода 
+  static CSPI e_adc(CSPI::ESPIInstance::SPI_E_ADC);                 // SPI-1 - внешнее АЦП
+  static CSPI esp32(CSPI::ESPIInstance::SPI_ESP32);                 // SPI-2 - WiFi 
   
   static CCAN can1(CCAN::ECAN_Id_Instance::CAN1_Id);                // CAN-1   
   static CCAN can2(CCAN::ECAN_Id_Instance::CAN2_Id);                // CAN-2   
@@ -91,7 +95,7 @@ void main(void)
   static CSDCard sd_card;       /* Инициализация CD карты. При успешной инициализации, читается RCA карты.
                                    Файловая система не реализована. */
   
-  if(sd_card.init() != Success)          
+  if(sd_card.init() != StatusRet::SUCCESS)          
   {
     /*Вывести сообщение на ПТ: "CD карта не определена!"*/
   }
@@ -100,7 +104,7 @@ void main(void)
                                     UDP или TCR/IP сервер не реализован, но, для обмена типа точка-точка, 
                                     например, контроллер-ноутбук, raw Ethernet кадров достаточно.*/
   
-  if(emac_drv.initEMAC() != Success)          
+  if(emac_drv.initEMAC() != StatusRet::SUCCESS)          
   {
     /*Вывести сообщение на ПТ: "Нет готовности Ethernet!"*/
   }

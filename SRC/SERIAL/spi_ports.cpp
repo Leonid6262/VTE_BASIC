@@ -40,11 +40,7 @@ void CSPI_ports::rw()
 CSPI_ports::CSPI_ports()
 {
   // SPI-0 
-  LPC_IOCON->P0_15  = IOCON_SPI;      // SCK0
-  LPC_IOCON->P0_17  = IOCON_SPI;      // MISO0
-  LPC_IOCON->P0_18  = IOCON_SPI;      // MOSI0
-  
-  LPC_SC->PCONP |= CLKPWR_PCONP_PCSSP0;
+
   LPC_SSP0->CR0 = 0;
   LPC_SSP0->CR0 = SPI_Config::CR0_DSS(bits_tr);
   LPC_SSP0->CR1 = 0;

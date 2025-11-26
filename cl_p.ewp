@@ -2189,6 +2189,9 @@
                 <name>$PROJ_DIR$\SRC\SERIAL\can.cpp</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\SRC\SERIAL\spi.cpp</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\SRC\SERIAL\spi_ports.cpp</name>
             </file>
             <file>
