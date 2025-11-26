@@ -21,8 +21,8 @@ void CPULSCALC::conv_and_calc()
     });
   /* 
   Для сокращения записи аргументов здесь использована си нотация enum, вмесо типобезопасной enum class c++.
-  CADC::ROTOR_CURRENT вместо static_cast<char>(CADC::EADC_NameCh::ROTOR_CURRENT) - считаю, разумный компромисс.
-  Пример доступа к измеренным значениям - rADC.data[CADC::ROTOR_CURRENT] 
+  CADC_STORAGE::ROTOR_CURRENT вместо static_cast<char>(CADC_STORAGE::EADC_NameCh::ROTOR_CURRENT) - считаю, разумный компромисс.
+  Пример доступа к измеренным значениям - pStorage.getExternal[CADC_STORAGE::ROTOR_CURRENT] 
   */
   
   sin_restoration();

@@ -181,7 +181,7 @@ void main(void)
   static auto& settings = CEEPSettings::getInstance().getSettings();    // Тестовые отладочный указатели. 
   static auto& data_e_adc = CADC_STORAGE::getInstance().getExternal();  // В production не используются
   static CDIN_STORAGE& din_instans = CDIN_STORAGE::getInstance();  
-
+ 
   while(true)
   {        
     settings = CEEPSettings::getInstance().getSettings();

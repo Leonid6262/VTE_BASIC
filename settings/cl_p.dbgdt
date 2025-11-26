@@ -159,7 +159,7 @@
                     <item>rem_osc</item>
                     <item>din_cpu</item>
                     <item>din_instans</item>
-                    <item></item>
+                    <item />
                 </expressions>
                 <col-names>
                     <item>Expression</item>
