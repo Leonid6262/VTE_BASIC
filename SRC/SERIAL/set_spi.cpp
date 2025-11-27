@@ -49,7 +49,7 @@ CSET_SPI::CSET_SPI(ESPIInstance SN)
   }  
 }
 
-LPC_SSP_TypeDef* CSET_SPI::getTypeDef()
+LPC_SSP_TypeDef* CSET_SPI::getTypeDef() const
 {
   return SSP;
 }

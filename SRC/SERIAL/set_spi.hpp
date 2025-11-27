@@ -14,7 +14,7 @@ public:
   
   CSET_SPI(ESPIInstance);
   
-  LPC_SSP_TypeDef* getTypeDef();
+  LPC_SSP_TypeDef* getTypeDef() const;
   
 private:
   

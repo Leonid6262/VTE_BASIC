@@ -26,3 +26,5 @@
 #include "rem_osc.hpp"
 #include "rtc.hpp"
 #include "conv_and_calc.hpp"
+
+#include "factory.hpp"
