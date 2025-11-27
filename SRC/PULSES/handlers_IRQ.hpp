@@ -1,7 +1,6 @@
 #pragma once
 
 #include "SIFU.hpp"
-#include "Compare.hpp"
 #include "adc.hpp"
 
 /*

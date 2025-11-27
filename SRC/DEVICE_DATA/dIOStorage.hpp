@@ -1,6 +1,7 @@
 #pragma once
 
 #include "settings_eep.hpp"
+#include "bool_name.hpp"
 
 class CDIN_STORAGE
 {
@@ -31,15 +32,25 @@ public:
   //--- Входы S600 byte-1 ---
   //
   
+  //--- Выходы контроллера Po0 ---
+  static inline void bNamePo0B0(Bit_switch state)    {edit_bit(0, state);}
+  static inline void REL_LEAKAGE_P(Bit_switch state) {edit_bit(1, state);} // Реле контроля изоляции К1
+  static inline void REL_LEAKAGE_N(Bit_switch state) {edit_bit(2, state);} // Реле контроля изоляции К2
+  static inline void bNamePo0B3(Bit_switch state)    {edit_bit(3, state);}
+  static inline void bNamePo0B4(Bit_switch state)    {edit_bit(4, state);}
+  static inline void bNamePo0B5(Bit_switch state)    {edit_bit(5, state);}
+  static inline void bNamePo0B6(Bit_switch state)    {edit_bit(6, state);}
+  static inline void bNamePo0B7(Bit_switch state)    {edit_bit(7, state);} 
+  
   //--- Выходы контроллера SPI ---
-  inline void Lamp_REDY         (bool state) {UData_dout[static_cast<char>(EOBNumber::CPU_SPI)].b0 = state;}
-  inline void System_FAILURE    (bool state) {UData_dout[static_cast<char>(EOBNumber::CPU_SPI)].b1 = state;}
-  inline void Excitation_Applied(bool state) {UData_dout[static_cast<char>(EOBNumber::CPU_SPI)].b2 = state;}
-  inline void START_Premission  (bool state) {UData_dout[static_cast<char>(EOBNumber::CPU_SPI)].b3 = state;}
-  inline void ON_Shunt_HVS      (bool state) {UData_dout[static_cast<char>(EOBNumber::CPU_SPI)].b4 = state;}
-  inline void DoutControllerB5  (bool state) {UData_dout[static_cast<char>(EOBNumber::CPU_SPI)].b5 = state;}
-  inline void DoutControllerB6  (bool state) {UData_dout[static_cast<char>(EOBNumber::CPU_SPI)].b6 = state;}
-  inline void DoutControllerB7  (bool state) {UData_dout[static_cast<char>(EOBNumber::CPU_SPI)].b7 = state;}
+  inline void Lamp_REDY         (Bit_switch state) {UData_dout[static_cast<char>(EOBNumber::CPU_SPI)].b0 = static_cast<bool>(state);}
+  inline void System_FAILURE    (Bit_switch state) {UData_dout[static_cast<char>(EOBNumber::CPU_SPI)].b1 = static_cast<bool>(state);}
+  inline void Excitation_Applied(Bit_switch state) {UData_dout[static_cast<char>(EOBNumber::CPU_SPI)].b2 = static_cast<bool>(state);}
+  inline void START_Premission  (Bit_switch state) {UData_dout[static_cast<char>(EOBNumber::CPU_SPI)].b3 = static_cast<bool>(state);}
+  inline void ON_Shunt_HVS      (Bit_switch state) {UData_dout[static_cast<char>(EOBNumber::CPU_SPI)].b4 = static_cast<bool>(state);}
+  inline void DoutControllerB5  (Bit_switch state) {UData_dout[static_cast<char>(EOBNumber::CPU_SPI)].b5 = static_cast<bool>(state);}
+  inline void DoutControllerB6  (Bit_switch state) {UData_dout[static_cast<char>(EOBNumber::CPU_SPI)].b6 = static_cast<bool>(state);}
+  inline void DoutControllerB7  (Bit_switch state) {UData_dout[static_cast<char>(EOBNumber::CPU_SPI)].b7 = static_cast<bool>(state);}
   
   //--- Выходы S600 ---
   //
@@ -111,7 +122,29 @@ public:
     return instance;
   }
   
+  static inline void UserLedOn()  {LPC_GPIO0->CLR = (1UL << B_ULED);} // Вкл. ULED
+  static inline void UserLedOff() {LPC_GPIO0->SET = (1UL << B_ULED);} // Выкл.ULED
+  static inline void Q1VF_On()    {LPC_GPIO1->CLR = (1UL << B_Q1VF);} // Вкл. Q1VF
+  static inline void Q1VF_Off()   {LPC_GPIO1->SET = (1UL << B_Q1VF);} // Выкл.Q1VF 
+  
+  static inline void edit_bit(char bit_number, Bit_switch state)    
+  { 
+    switch(state)
+    {
+    case Bit_switch::ON:
+      { LPC_GPIO2->SET = static_cast<unsigned int>(1UL << (B0_PORT_OUT + (bit_number & 0x07))); } //dout-on
+      break;
+    case Bit_switch::OFF:
+      { LPC_GPIO2->CLR = static_cast<unsigned int>(1UL << (B0_PORT_OUT + (bit_number & 0x07))); } //dout-off
+      break;
+    }
+  }
+  
 private:
+  
+  static constexpr unsigned short B_ULED       =  9;   // Бит U-LED
+  static constexpr unsigned short B_Q1VF       = 13;   // Бит Q1VF
+  static constexpr unsigned short B0_PORT_OUT  = 24;   // 1-й бит порта
   
   static constexpr unsigned short N_BITS = 8;          // Количество бит в портах
   static constexpr unsigned int TIC_ms = 10000;
@@ -123,10 +156,10 @@ private:
   // То есть, 50*TIC_ms = 50ms, 0*TIC_ms - нет фильтрации, и т.п. 
   static constexpr unsigned int cConst_integr_Pi0[G_CONST::BYTES_RW_MAX + 1][N_BITS] = 
   {
-    {50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms},   // Контроллер Pi0
-    {50*TIC_ms, 50*TIC_ms, 2000*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms}, // Контроллер SPI
-    {50*TIC_ms, 50*TIC_ms, 2000*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms}, // S600 byte-0 SPI
-    {50*TIC_ms, 50*TIC_ms, 2000*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms}, // S600 byte-1 SPI
+    {50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms}, // Контроллер Pi0
+    {50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms}, // Контроллер SPI
+    {50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms}, // S600 byte-0 SPI
+    {50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms, 50*TIC_ms}, // S600 byte-1 SPI
   }; 
   
   CEEPSettings& settings;

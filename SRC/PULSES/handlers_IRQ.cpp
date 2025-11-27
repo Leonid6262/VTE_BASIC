@@ -1,6 +1,5 @@
 #include "handlers_IRQ.hpp"
 #include "system_LPC177x.h"
-#include "dout_cpu.hpp"
 #include <cmath>
 #include "LPC407x_8x_177x_8x.h"
 

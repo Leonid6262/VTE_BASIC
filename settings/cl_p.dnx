@@ -12,7 +12,7 @@
         <ByteLimit>50</ByteLimit>
     </Stack>
     <DebugChecksum>
-        <Checksum>2800813035</Checksum>
+        <Checksum>3023264367</Checksum>
     </DebugChecksum>
     <CodeCoverage>
         <Enabled>_ 0</Enabled>
@@ -32,10 +32,10 @@
         <TraceBufferSize>0x00010000</TraceBufferSize>
         <TraceStallIfFIFOFull>0x00000000</TraceStallIfFIFOFull>
         <TracePortSize>0x00000004</TracePortSize>
-        <jlinkResetStyle>12</jlinkResetStyle>
-        <jlinkResetStrategy>0</jlinkResetStrategy>
         <LeaveTargetRunning>_ 0</LeaveTargetRunning>
         <CStepIntDis>_ 0</CStepIntDis>
+        <jlinkResetStyle>12</jlinkResetStyle>
+        <jlinkResetStrategy>0</jlinkResetStrategy>
     </JLinkDriver>
     <SWOTraceHWSettings>
         <OverrideDefaultClocks>0</OverrideDefaultClocks>
@@ -156,6 +156,11 @@
         <FreqHi>0</FreqHi>
         <MultiCoreRunAll>1</MultiCoreRunAll>
     </Simulator>
+    <LogFile>
+        <LoggingEnabled>_ 0</LoggingEnabled>
+        <LogFile>_ "$PROJ_DIR$\LogFile1.log"</LogFile>
+        <Category2>_ 2</Category2>
+    </LogFile>
     <struct_types>
         <Fmt0>LPC_CAN_TypeDef-BTR	3	0</Fmt0>
         <Fmt1>LPC_CAN_TypeDef-GSR	1	0</Fmt1>
@@ -172,8 +177,6 @@
         <Fmt12>struct CSIFU::SyncState-cur_power_shift	3	0</Fmt12>
         <Fmt13>struct CSIFU::SyncState-d_power_shift	3	0</Fmt13>
         <Fmt14>struct CSIFU::SyncState-task_power_shift	3	0</Fmt14>
-        <Fmt15>union CDIN_STORAGE::&lt;Unnamed 1&gt;-all	1	0</Fmt15>
-        <Fmt16>union CSPI_ports::&lt;Unnamed 1&gt;-all	1	0</Fmt16>
     </struct_types>
     <array_types>
         <Fmt0>byte[8]	3	0</Fmt0>
@@ -344,10 +347,24 @@
         <Enabled>0</Enabled>
         <ShowSource>0</ShowSource>
     </Trace2>
+    <DisassembleMode>
+        <mode>0</mode>
+    </DisassembleMode>
+    <Breakpoints2>
+        <Bp0>_ 1 "EMUL_CODE" "{$PROJ_DIR$\SRC\_main.cpp}.53.3" 0 0 1 "" 0 "" 0</Bp0>
+        <Bp1>_ 1 "EMUL_CODE" "{$PROJ_DIR$\SRC\_main.cpp}.57.3" 0 0 1 "" 0 "" 0</Bp1>
+        <Count>2</Count>
+    </Breakpoints2>
     <TermIOLog>
         <LoggingEnabled>_ 0</LoggingEnabled>
         <LogFile>_ ""</LogFile>
     </TermIOLog>
+    <Aliases>
+        <A0>_ "G:\S\Programs\IAR_N\SPI_WIFI_2\SRC\INIT\emc.c" ""</A0>
+        <A1>_ "G:\S\Programs\IAR_N\SPI_WIFI_2\SRC\main.cpp" ""</A1>
+        <Count>2</Count>
+        <SuppressDialog>0</SuppressDialog>
+    </Aliases>
     <DriverProfiling>
         <Enabled>0</Enabled>
         <Mode>1</Mode>
@@ -360,21 +377,4 @@
     <CallStackStripe>
         <ShowTiming>1</ShowTiming>
     </CallStackStripe>
-    <LogFile>
-        <LoggingEnabled>_ 0</LoggingEnabled>
-        <LogFile>_ "$PROJ_DIR$\LogFile1.log"</LogFile>
-        <Category2>_ 2</Category2>
-    </LogFile>
-    <DisassembleMode>
-        <mode>0</mode>
-    </DisassembleMode>
-    <Breakpoints2>
-        <Count>0</Count>
-    </Breakpoints2>
-    <Aliases>
-        <A0>_ "G:\S\Programs\IAR_N\SPI_WIFI_2\SRC\INIT\emc.c" ""</A0>
-        <A1>_ "G:\S\Programs\IAR_N\SPI_WIFI_2\SRC\main.cpp" ""</A1>
-        <Count>2</Count>
-        <SuppressDialog>0</SuppressDialog>
-    </Aliases>
 </settings>

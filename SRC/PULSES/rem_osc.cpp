@@ -5,6 +5,12 @@
 #include "AdcStorage.hpp"
 #include <stdio.h>
 
+/* Буферы передачи/приёма по DMA класса CREM_OSC */
+#pragma location = ".dma_buffers"
+__root signed short CREM_OSC::tx_dma_buffer[CREM_OSC::TRANSACTION_LENGTH];
+#pragma location = ".dma_buffers"
+__root signed short CREM_OSC::rx_dma_buffer[CREM_OSC::TRANSACTION_LENGTH];
+
 CREM_OSC::CREM_OSC(CDMAcontroller& rContDMA, CPULSCALC& rP) : rContDMA(rContDMA), rPulsCalc(rP)
 {
   
@@ -81,7 +87,7 @@ void CREM_OSC::init_dma()
     CDMAcontroller::EConnNumber::SSP2_Tx,         // Номер периферийного подключения
     CDMAcontroller::DmaBurst::SIZE_4,             // Количество единичных элементов транзакции 
     CDMAcontroller::EWidth::SHORT,                // Размер единичного элемента
-    OFF                                           // Разрешение/запрет события окончания передачи (ON/OFF)
+    static_cast<bool>(Bit_switch::OFF)            // Разрешение/запрет события окончания передачи (ON/OFF)
   };
   
   rContDMA.init_M2P2M_Channel(&cfg_ch_tx); 
@@ -94,7 +100,7 @@ void CREM_OSC::init_dma()
     CDMAcontroller::EConnNumber::SSP2_Rx,         // Номер периферийного подключения
     CDMAcontroller::DmaBurst::SIZE_4,             // Количество единичных элементов транзакции
     CDMAcontroller::EWidth::SHORT,                // Размер единичного элемента
-    OFF                                           // Разрешение/запрет события окончания приёма (ON/OFF)
+    static_cast<bool>(Bit_switch::OFF)            // Разрешение/запрет события окончания приёма (ON/OFF)
   };
   
   rContDMA.init_M2P2M_Channel(&cfg_ch_rx); 

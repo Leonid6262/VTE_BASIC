@@ -6,7 +6,7 @@ enum class StatusRet
   SUCCESS = 1  
 };
 
-enum Bit_switch 
+enum class Bit_switch 
 { 
   OFF = 0, 
   ON = 1 

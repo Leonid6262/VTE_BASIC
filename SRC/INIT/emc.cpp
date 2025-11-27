@@ -1,5 +1,7 @@
 #include "emc.hpp"
 #include "system_LPC177x.h"
+#include "dIOStorage.hpp"
+#include "LPC407x_8x_177x_8x.h"
 
 // Инициализация EMC и тестирование EXTRAM
 void EMC_Init_Check( void )
@@ -132,11 +134,11 @@ void EMC_Init_Check( void )
         Counter_Err_RAM = (Counter_Err_RAM + 1) & 0x1FFFF;
         if(Counter_Err_RAM < 0x10000) 
         {
-          CDout_cpu::UserLedOn();
+          CDIN_STORAGE::UserLedOn();
         }
         else
         {
-          CDout_cpu::UserLedOff();
+          CDIN_STORAGE::UserLedOff();
         }
       }
       

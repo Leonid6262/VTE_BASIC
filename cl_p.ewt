@@ -2919,21 +2919,6 @@
                 <name>$PROJ_DIR$\SRC\SERIAL\uart.cpp</name>
             </file>
         </group>
-        <group>
-            <name>TESTS</name>
-            <file>
-                <name>$PROJ_DIR$\SRC\TEST\Compare.cpp</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\SRC\TEST\terminal.cpp</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\SRC\TEST\test_eth.cpp</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\SRC\TEST\Tests.cpp</name>
-            </file>
-        </group>
         <file>
             <name>$PROJ_DIR$\SRC\_factory.cpp</name>
         </file>
@@ -2948,9 +2933,6 @@
         </file>
         <file>
             <name>$PROJ_DIR$\SRC\din_cpu.cpp</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\SRC\dout_cpu.cpp</name>
         </file>
         <file>
             <name>$PROJ_DIR$\SRC\rtc.cpp</name>
