@@ -16,42 +16,38 @@ void main(void)
   if(CEEPSettings::getInstance().loadSettings() != StatusRet::SUCCESS)   // Загрузка уставок (RAM <- EEPROM)   
   { /*  "Ошибка CRC. Используются уставки по умолчанию!" */ }  
    
-  auto terminal = CFactory::createTerminal();           // COM Port (uart0 - Terminal)
-  auto rs485_01 = CFactory::createRS485_01();           // RS485-1 (uart2)
-  auto rs485_02 = CFactory::createRS485_02();           // RS485-2 (uart3)
-  
-  auto set_spi0 = CFactory::initSpiPorts();             // Конфигурация SPI-0 - порты ввода/вывода
-  auto set_spi1 = CFactory::initSpiADC();               // Конфигурация SPI-1 - внешнее АЦП
-  auto set_spi2 = CFactory::initSpiESP32();             // Конфигурация SPI-2 - WiFi на ESP32
- 
-  auto set_can1 = CFactory::initCAN1();                 // Конфигурация CAN-1  
-  auto set_can2 = CFactory::initCAN2();                 // Конфигурация CAN-2 
-  
-  auto dac0    = CFactory::createDAC0();                // DAC-0 (Controller dac)
-  auto dac_cos = CFactory::createPWMDac1();             // DAC-1 (PWM1:5, Cos_phi)
-  auto dac4_20 = CFactory::createPWMDac1();             // DAC-2 (PWM1:4. 4...20mA)
-                                
-  auto i_adc = CFactory::createIADC();                  // Внутренее ADC.
-  auto adc   = CFactory::createEADC(set_spi1);          // Внешнее ADC. Подключено к SPI-1
-  
-  static CSPI_ports spi_ports(set_spi0.getTypeDef());   // Дискретные входы и выходы доступные по SPI.
+  static auto COMport      = CFactory::createCOMport(); // COM Port (uart0 - Terminal)
+  static auto initRS485_01 = CFactory::initRS485_01();  // Конфигурация RS485-1 (uart2)
+  static auto initRS485_02 = CFactory::initRS485_02();  // Конфигурация RS485-2 (uart3)
 
-  static CDin_cpu din_cpu;                              // Дискретные входы контроллера (порты Pi0 и Pi1 по аналогии с СМ3)
-                                                        // Выходы контроллера (порт Po0 по аналогии с СМ3 в dIOStorage.hpp)
+  static auto init_can1 = CFactory::initCAN1();         // Конфигурация CAN-1  
+  static auto init_can2 = CFactory::initCAN2();         // Конфигурация CAN-2 
   
-  static CSDCard sd_card;                               // Инициализация CD карты.  
-  if(sd_card.init() != StatusRet::SUCCESS) 
-  { /* Сообщение: "CD карта не определена!"*/ }
-   
-  static CEMAC_DRV emac_drv;                            // Драйверы EMAC.  
+  static auto dac0    = CFactory::createDAC0();         // DAC-0 (Controller dac)
+  static auto dac_cos = CFactory::createPWMDac1();      // DAC-1 (PWM1:5, Cos_phi)
+  static auto dac4_20 = CFactory::createPWMDac2();      // DAC-2 (PWM1:4. 4...20mA)
+                                
+  static auto i_adc = CFactory::createIADC();           // Внутренее ADC.
+  static auto adc   = CFactory::createEADC();           // Внешнее ADC. Подключено к SPI-1 (см. CFactory)
+  
+  static auto spi_ports = CFactory::createSPIports();   // Входы и выходы доступные по SPI. Подключено к SPI-0 (см. CFactory)                                                
+  static auto din_cpu   = CFactory::createDINcpu();     // Дискретные входы контроллера (порты Pi0 и Pi1 по аналогии с СМ3)
+                                                        // Выходы контроллера (порт Po0 по аналогии с СМ3 в dIOStorage.hpp)
+  static auto rt_clock = CFactory::createRTC();         // Системные часы
+  
+  static auto emac_drv = CFactory::createEMACdrv();     // Драйверы EMAC.  
   if(emac_drv.initEMAC() != StatusRet::SUCCESS) 
   { /* Сообщение: "Нет готовности Ethernet!"*/ }
   
-  static CRTC rt_clock;                                                 // Системные часы
-  static CPULSCALC puls_calc(adc);                                      // Измерение/вычисление всех аналоговых данных.                                                                                                             
+
+  
+  static CPULSCALC puls_calc(adc);                                      // Измерение и обработка всех аналоговых сигналов.                                                                                                             
   static CSIFU sifu(puls_calc);                                         // СИФУ.  
   static CDMAcontroller cont_dma;                                       // Управление каналами DMA.
+  
+  CFactory::init_spi2();                                                // Конфигурация SPI-2 - WiFi на ESP32
   static CREM_OSC rem_osc(cont_dma, puls_calc);                         // Дистанционный осциллограф (WiFi модуль на ESP32).                                                    
+  
   CProxyHandlerTIMER::getInstance().set_pointers(&sifu, &rem_osc);      // Proxy Singleton доступа к Handler TIMER.                                                                  
   
   sifu.init_and_start();                                                // Старт SIFU
