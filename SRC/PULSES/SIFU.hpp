@@ -2,7 +2,7 @@
 
 #include "LPC407x_8x_177x_8x.h"
 #include "rem_osc.hpp"
-#include "conv_and_calc.hpp"
+#include "puls_calc.hpp"
 
 class CSIFU
 { 

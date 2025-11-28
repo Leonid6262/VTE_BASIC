@@ -28,7 +28,6 @@ void main(void)
   static auto dac4_20 = CFactory::createPWMDac2();      // DAC-2 (PWM1:4. 4...20mA)
                                 
   static auto i_adc = CFactory::createIADC();           // Внутренее ADC.
-  static auto adc   = CFactory::createEADC();           // Внешнее ADC. Подключено к SPI-1 (см. CFactory)
   
   static auto spi_ports = CFactory::createSPIports();   // Входы и выходы доступные по SPI. Подключено к SPI-0 (см. CFactory)                                                
   static auto din_cpu   = CFactory::createDINcpu();     // Дискретные входы контроллера (порты Pi0 и Pi1 по аналогии с СМ3)
@@ -38,21 +37,12 @@ void main(void)
   static auto emac_drv = CFactory::createEMACdrv();     // Драйверы EMAC.  
   if(emac_drv.initEMAC() != StatusRet::SUCCESS) 
   { /* Сообщение: "Нет готовности Ethernet!"*/ }
-  
-
-  
-  static CPULSCALC puls_calc(adc);                                      // Измерение и обработка всех аналоговых сигналов.                                                                                                             
-  static CSIFU sifu(puls_calc);                                         // СИФУ.  
-  static CDMAcontroller cont_dma;                                       // Управление каналами DMA.
-  
-  CFactory::init_spi2();                                                // Конфигурация SPI-2 - WiFi на ESP32
-  static CREM_OSC rem_osc(cont_dma, puls_calc);                         // Дистанционный осциллограф (WiFi модуль на ESP32).                                                    
-  
-  CProxyHandlerTIMER::getInstance().set_pointers(&sifu, &rem_osc);      // Proxy Singleton доступа к Handler TIMER.                                                                  
-  
-  sifu.init_and_start();                                                // Старт SIFU
    
-  CDIN_STORAGE::UserLedOff();                                           // Визуальный контроль окончания инициализации
+  static auto cont_dma = CFactory::createDMAc();        // Управление каналами DMA. 
+
+  CFactory::start_puls_system(cont_dma);                // Запуск СИФУ и всех её зависимостей
+    
+  CDIN_STORAGE::UserLedOff();                           // Визуальный контроль окончания инициализации
   
   static auto& settings = CEEPSettings::getInstance().getSettings();    // Тестовые отладочные указатели. 
   static auto& data_e_adc = CADC_STORAGE::getInstance().getExternal();  // В production не используются

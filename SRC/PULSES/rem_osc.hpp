@@ -1,7 +1,7 @@
 #pragma once
 
 #include "controllerDMA.hpp"
-#include "conv_and_calc.hpp"
+#include "puls_calc.hpp"
 #include "bool_name.hpp"
 
 class CREM_OSC

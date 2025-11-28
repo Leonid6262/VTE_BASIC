@@ -1,30 +1,19 @@
 #pragma once
 
-#include "handlers_IRQ.hpp"
-#include "controllerDMA.hpp"
-#include "set_spi.hpp"
-#include "spi_ports.hpp"
+
+
+
 #include "Ports_init.hpp"
 #include "emc.hpp"
 #include "Timers_init.hpp"
-#include "crc16.hpp"
-#include "settings_eep.hpp"
-#include "adc.hpp"
-#include "i_adc.hpp"
+
 #include "AdcStorage.hpp"
 #include "dIOStorage.hpp"
-#include "uart.hpp"
-#include "can.hpp"
-#include "SIFU.hpp"
-#include "dac.hpp"
-#include "lpc177x_8x_can.h"
+
+
+
 #include "IntPriority.hpp" 
 #include "pause_us.hpp"
-#include "din_cpu.hpp"
-#include "SDCard_init.hpp"
-#include "emac.hpp"
-#include "rem_osc.hpp"
-#include "rtc.hpp"
-#include "conv_and_calc.hpp"
+
 
 #include "factory.hpp"

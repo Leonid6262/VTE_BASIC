@@ -12,6 +12,10 @@
 #include "din_cpu.hpp"
 #include "emac.hpp"
 #include "rtc.hpp"
+#include "controllerDMA.hpp"
+#include "SIFU.hpp"
+#include "puls_calc.hpp"
+#include "handlers_IRQ.hpp"
 
 class CFactory {
 public:
@@ -22,7 +26,7 @@ public:
     static CUART initRS485_01();
     static CUART initRS485_02();
     
-    static void init_spi2();
+    //static void init_spi2();
 
     static CCAN initCAN1();
     static CCAN initCAN2();
@@ -32,13 +36,18 @@ public:
     static CDAC_PWM createPWMDac2();
     
     static CIADC createIADC();
-    static CADC createEADC();
-    
+   
     static CSPI_ports createSPIports();    
     static CDin_cpu createDINcpu();
     
     static CEMAC_DRV createEMACdrv();
     
+    static CDMAcontroller createDMAc();
+    
+    static CPULSCALC createPULSCALC();
+    
     static CRTC createRTC();
+    
+    static void start_puls_system(CDMAcontroller&);
 };
 

@@ -1,4 +1,4 @@
-#include "conv_and_calc.hpp"
+#include "puls_calc.hpp"
 #include "AdcStorage.hpp"
 
 CPULSCALC::CPULSCALC(CADC& rAdc) : rAdc(rAdc) 

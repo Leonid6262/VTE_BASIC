@@ -2892,10 +2892,10 @@
         <group>
             <name>PULSES</name>
             <file>
-                <name>$PROJ_DIR$\SRC\PULSES\conv_and_calc.cpp</name>
+                <name>$PROJ_DIR$\SRC\PULSES\handlers_IRQ.cpp</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\SRC\PULSES\handlers_IRQ.cpp</name>
+                <name>$PROJ_DIR$\SRC\PULSES\puls_calc.cpp</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\SRC\PULSES\rem_osc.cpp</name>
