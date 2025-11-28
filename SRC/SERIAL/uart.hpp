@@ -13,10 +13,8 @@ public:
   
   CUART(EUartInstance);
   
-  void transfer_char(char);
-  void transfer_string(char*);
-  char receive_char();  
-  
+  LPC_UART_TypeDef* getTypeDef() const;
+
 private: 
     // Настройки скорости
     struct SBaudRateSettings {
@@ -61,7 +59,7 @@ private:
     TXEN         = 1UL << 7     // Разрешение передачи
   };  
   
-  LPC_UART_TypeDef* UART_N;
+  LPC_UART_TypeDef* UART;
   
 };
 

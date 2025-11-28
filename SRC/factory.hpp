@@ -16,18 +16,16 @@
 #include "SIFU.hpp"
 #include "puls_calc.hpp"
 #include "handlers_IRQ.hpp"
+#include "terminal.hpp"
 
 class CFactory {
 public:
     
     static void init_settings();
   
-    static CUART createCOMport();
     static CUART initRS485_01();
     static CUART initRS485_02();
     
-    //static void init_spi2();
-
     static CCAN initCAN1();
     static CCAN initCAN2();
 
@@ -47,6 +45,8 @@ public:
     static CPULSCALC createPULSCALC();
     
     static CRTC createRTC();
+    
+    static CTERMINAL createTERMINAL();
     
     static void start_puls_system(CDMAcontroller&);
 };

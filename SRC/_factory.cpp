@@ -1,6 +1,5 @@
 #include "factory.hpp"
 
-CUART CFactory::createCOMport()         { return CUART(CUART::EUartInstance::UART_TERMINAL);     }
 CUART CFactory::initRS485_01()          { return CUART(CUART::EUartInstance::UART_RS485_01);     }
 CUART CFactory::initRS485_02()          { return CUART(CUART::EUartInstance::UART_RS485_02);     }
 CCAN CFactory::initCAN1()               { return CCAN(CCAN::ECAN_Id_Instance::CAN1_Id);          }
@@ -31,6 +30,13 @@ CPULSCALC CFactory::createPULSCALC()
   static CADC adc(init_spi.getTypeDef());               // Внешнее ADC. Подключено к SPI-1
   return CPULSCALC(adc);                                 
 }
+
+CTERMINAL CFactory::createTERMINAL()
+{
+  CUART uart(CUART::EUartInstance::UART_TERMINAL);      // Конфигурация UART-0 - пультовый терминал
+  return CTERMINAL(uart.getTypeDef());                  // Пультовый терминал
+}
+
 void CFactory::start_puls_system(CDMAcontroller& rCont_dma)
 {
   CSET_SPI init_spi1(CSET_SPI::ESPIInstance::SPI_E_ADC);                // Конфигурация SPI-1 - внешнее АЦП

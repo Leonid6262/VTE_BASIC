@@ -349,6 +349,7 @@
                     <state>$PROJ_DIR$\SRC\PULSES\</state>
                     <state>$PROJ_DIR$\SRC\SERIAL\</state>
                     <state>$PROJ_DIR$\SRC\DEVICE_DATA\</state>
+                    <state>$PROJ_DIR$\SRC\TERMINAL\</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -2196,6 +2197,12 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\SRC\SERIAL\uart.cpp</name>
+            </file>
+        </group>
+        <group>
+            <name>TERMINAL</name>
+            <file>
+                <name>$PROJ_DIR$\SRC\TERMINAL\terminal.cpp</name>
             </file>
         </group>
         <file>

@@ -2919,6 +2919,12 @@
                 <name>$PROJ_DIR$\SRC\SERIAL\uart.cpp</name>
             </file>
         </group>
+        <group>
+            <name>TERMINAL</name>
+            <file>
+                <name>$PROJ_DIR$\SRC\TERMINAL\terminal.cpp</name>
+            </file>
+        </group>
         <file>
             <name>$PROJ_DIR$\SRC\_factory.cpp</name>
         </file>
