@@ -4,7 +4,7 @@ CSET_SPI::CSET_SPI(ESPIInstance SN)
 {   
   switch(SN)
   {
-  case ESPIInstance::SPI_PORTS:
+  case ESPIInstance::SPI_0:
     SSP = LPC_SSP0;
     LPC_IOCON->P0_15  = IOCON_SPI0;       // SCK0
                                           // SSEL0 - не проведен, не используется
@@ -18,7 +18,7 @@ CSET_SPI::CSET_SPI(ESPIInstance SN)
     SSP->CR1 |= SPI_Config::CR1_SSP_EN; 
     
     break;
-  case ESPIInstance::SPI_E_ADC:   
+  case ESPIInstance::SPI_1:   
     SSP = LPC_SSP1;
     LPC_IOCON->P4_20 = D_MODE_PULLUP | IOCON_SPI1; // SCK1 
     LPC_IOCON->P4_21 = D_MODE_PULLUP | IOCON_SPI1; // SSEL1
@@ -31,7 +31,7 @@ CSET_SPI::CSET_SPI(ESPIInstance SN)
     SPI_Config::set_spi_clock(SSP, Hz_SPI1, PeripheralClock);
     SSP->CR1 |= SPI_Config::CR1_SSP_EN;    
     break;
-  case ESPIInstance::SPI_ESP32:
+  case ESPIInstance::SPI_2:
     SSP = LPC_SSP2;
     LPC_IOCON->P5_2  = IOCON_SPI2;              // SCK2 
                                                 // SSEL2 - не проведен, не используется  

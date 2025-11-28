@@ -11,7 +11,18 @@ __root signed short CREM_OSC::tx_dma_buffer[CREM_OSC::TRANSACTION_LENGTH];
 #pragma location = ".dma_buffers"
 __root signed short CREM_OSC::rx_dma_buffer[CREM_OSC::TRANSACTION_LENGTH];
 
-CREM_OSC::CREM_OSC(CDMAcontroller& rContDMA, CPULSCALC& rP) : rContDMA(rContDMA), rPulsCalc(rP)
+CREM_OSC::CREM_OSC(CDMAcontroller& rContDMA, 
+                   CDMAcontroller::ChannelMap ChMap_rx, 
+                   CDMAcontroller::ChannelMap ChMap_tx,
+                   CDMAcontroller::EConnNumber ConnN_rx,
+                   CDMAcontroller::EConnNumber ConnN_tx,
+                   CPULSCALC& rP) :
+  rContDMA(rContDMA), 
+  ChMap_rx(ChMap_rx), 
+  ChMap_tx(ChMap_tx), 
+  ConnN_rx(ConnN_rx), 
+  ConnN_tx(ConnN_tx), 
+  rPulsCalc(rP)
 {
   
   // Пример структуры инициализирующих значений CREM_OSC. Дистанционный осцилограф (ESP32 c WiFi модулем)
@@ -66,11 +77,11 @@ CREM_OSC::CREM_OSC(CDMAcontroller& rContDMA, CPULSCALC& rP) : rContDMA(rContDMA)
 void CREM_OSC::start_dma_transfer()
 {
   // Старт чтения
-  rContDMA.StartRxTransfer(CDMAcontroller::ChannelMap::SPI2_Rx_Channel, 
+  rContDMA.StartRxTransfer(ChMap_rx,//CDMAcontroller::ChannelMap::SPI2_Rx_Channel, 
                            static_cast<unsigned int>((long long)rx_dma_buffer),                           
                            TRANSACTION_LENGTH);
   // Старт записи
-  rContDMA.StartTxTransfer(CDMAcontroller::ChannelMap::SPI2_Tx_Channel, 
+  rContDMA.StartTxTransfer(ChMap_tx,//CDMAcontroller::ChannelMap::SPI2_Tx_Channel, 
                            static_cast<unsigned int>((long long)tx_dma_buffer),                           
                            TRANSACTION_LENGTH);
 }
@@ -82,9 +93,9 @@ void CREM_OSC::init_dma()
   // Конфигурация канала записи
   CDMAcontroller::SChannelConfig cfg_ch_tx
   {
-    CDMAcontroller::ChannelMap::SPI2_Tx_Channel,  // Номер канала
+    ChMap_tx,//CDMAcontroller::ChannelMap::SPI2_Tx_Channel,  // Номер канала
     CDMAcontroller::ETransferType::TYPE_M2P,      // Тип канала
-    CDMAcontroller::EConnNumber::SSP2_Tx,         // Номер периферийного подключения
+    ConnN_tx,//CDMAcontroller::EConnNumber::SSP2_Tx,         // Номер периферийного подключения
     CDMAcontroller::DmaBurst::SIZE_4,             // Количество единичных элементов транзакции 
     CDMAcontroller::EWidth::SHORT,                // Размер единичного элемента
     static_cast<bool>(Bit_switch::OFF)            // Разрешение/запрет события окончания передачи (ON/OFF)
@@ -95,9 +106,9 @@ void CREM_OSC::init_dma()
   // Конфигурация канала чтения
   CDMAcontroller::SChannelConfig cfg_ch_rx
   {
-    CDMAcontroller::ChannelMap::SPI2_Rx_Channel,  // Номер канала
+    ChMap_rx,//CDMAcontroller::ChannelMap::SPI2_Rx_Channel,  // Номер канала
     CDMAcontroller::ETransferType::TYPE_P2M,      // Тип канала
-    CDMAcontroller::EConnNumber::SSP2_Rx,         // Номер периферийного подключения
+    ConnN_rx,//CDMAcontroller::EConnNumber::SSP2_Rx,         // Номер периферийного подключения
     CDMAcontroller::DmaBurst::SIZE_4,             // Количество единичных элементов транзакции
     CDMAcontroller::EWidth::SHORT,                // Размер единичного элемента
     static_cast<bool>(Bit_switch::OFF)            // Разрешение/запрет события окончания приёма (ON/OFF)

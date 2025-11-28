@@ -7,9 +7,9 @@
 class CSET_SPI{
 public:    
   enum class ESPIInstance {
-    SPI_PORTS,            // SPI-0 - порты ввода/вывода
-    SPI_E_ADC,            // SPI-1 - внешнее АЦП
-    SPI_ESP32             // SPI-2 - WiFi
+    SPI_0,            // SPI-0 - порты ввода/вывода
+    SPI_1,            // SPI-1 - внешнее АЦП
+    SPI_2             // SPI-2 - WiFi
   };
   
   CSET_SPI(ESPIInstance);

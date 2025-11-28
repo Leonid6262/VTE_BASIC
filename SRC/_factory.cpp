@@ -20,14 +20,14 @@ void CFactory::init_settings()
 }
 CSPI_ports CFactory::createSPIports()
 {
-  CSET_SPI init_spi(CSET_SPI::ESPIInstance::SPI_PORTS); // Конфигурация SPI-0 - порты ввода/вывода
+  CSET_SPI init_spi(CSET_SPI::ESPIInstance::SPI_0); // Конфигурация SPI-0 - порты ввода/вывода
   return CSPI_ports(init_spi.getTypeDef());
 }
 
 CPULSCALC CFactory::createPULSCALC()
 {
-  CSET_SPI init_spi(CSET_SPI::ESPIInstance::SPI_E_ADC); // Конфигурация SPI-1 - внешнее АЦП
-  static CADC adc(init_spi.getTypeDef());               // Внешнее ADC. Подключено к SPI-1
+  CSET_SPI init_spi(CSET_SPI::ESPIInstance::SPI_1); // Конфигурация SPI-1 - внешнее АЦП
+  static CADC adc(init_spi.getTypeDef());           // Внешнее ADC. Подключено к SPI-1
   return CPULSCALC(adc);                                 
 }
 
@@ -39,12 +39,21 @@ CTERMINAL CFactory::createTERMINAL()
 
 void CFactory::start_puls_system(CDMAcontroller& rCont_dma)
 {
-  CSET_SPI init_spi1(CSET_SPI::ESPIInstance::SPI_E_ADC);                // Конфигурация SPI-1 - внешнее АЦП
+  CSET_SPI init_spi1(CSET_SPI::ESPIInstance::SPI_1);                    // Конфигурация SPI-1 - внешнее АЦП
   static CADC adc(init_spi1.getTypeDef());                              // Внешнее ADC. Подключено к SPI-1
   static CPULSCALC puls_calc(adc);                                      // Измерение и обработка всех аналоговых сигналов.
   static CSIFU sifu(puls_calc);                                         // СИФУ.
-  CSET_SPI init_dma_spi(CSET_SPI::ESPIInstance::SPI_ESP32);             // Конфигурация SPI-2 - WiFi на ESP32
-  static CREM_OSC rem_osc(rCont_dma, puls_calc);                        // Дистанционный осциллограф (WiFi модуль на ESP32).   
+  
+  CSET_SPI init_dma_spi(CSET_SPI::ESPIInstance::SPI_2);                 // Конфигурация SPI-2 для WiFi на ESP32
+  static CREM_OSC rem_osc(                                              // Дистанционный осциллограф (WiFi модуль на ESP32).
+                          rCont_dma,                                            //Контроллер DMA
+                          CDMAcontroller::ChannelMap::SPI2_Rx_Channel,          //Номер канала Rx
+                          CDMAcontroller::ChannelMap::SPI2_Tx_Channel,          //Номер канала Tx 
+                          CDMAcontroller::EConnNumber::SSP2_Rx,                 //Номер подключения Rx
+                          CDMAcontroller::EConnNumber::SSP2_Tx,                 //Номер подключения Tx
+                          puls_calc                                             //Измерение и обработка
+                            );              
+  
   CProxyHandlerTIMER::getInstance().set_pointers(&sifu, &rem_osc);      // Proxy Singleton доступа к Handler TIMER. 
   sifu.init_and_start();                                                // Старт SIFU
 }

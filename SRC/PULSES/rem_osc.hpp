@@ -44,6 +44,11 @@ private:
   };
   
   static constexpr unsigned short send_TRACKS = 0x8F00; //Передача данных треков
+  
+  CDMAcontroller::ChannelMap ChMap_rx;
+  CDMAcontroller::ChannelMap ChMap_tx;
+  CDMAcontroller::EConnNumber ConnN_rx;
+  CDMAcontroller::EConnNumber ConnN_tx;
 
 public:
   
@@ -68,7 +73,13 @@ public:
   };
 
   SSET_init set_init;
-  CREM_OSC(CDMAcontroller&, CPULSCALC&);
+  CREM_OSC(CDMAcontroller&, 
+           CDMAcontroller::ChannelMap, 
+           CDMAcontroller::ChannelMap, 
+           CDMAcontroller::EConnNumber,
+           CDMAcontroller::EConnNumber,
+           CPULSCALC&
+             );
   CPULSCALC& rPulsCalc;
   
   static signed short tx_dma_buffer[TRANSACTION_LENGTH];
