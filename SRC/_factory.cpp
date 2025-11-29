@@ -32,9 +32,11 @@ CPULSCALC CFactory::createPULSCALC()
 }
 
 CTERMINAL CFactory::createTERMINAL()
-{
-  CUART uart(CUART::EUartInstance::UART_TERMINAL);      // Конфигурация UART-0 - пультовый терминал
-  return CTERMINAL(uart.getTypeDef());                  // Пультовый терминал
+{  
+  CUART uart(CUART::EUartInstance::UART_TERMINAL);                              // Конфигурация UART-0 - пультовый терминал
+  CTerminalUartDriver& pUartDriver = CTerminalUartDriver::getInstance();
+  pUartDriver.init(uart.getTypeDef());                                          // Инициализация драйвера UART-0
+  return CTERMINAL(pUartDriver);                                                // Пультовый терминал. Подвязан к UART-0
 }
 
 void CFactory::start_puls_system(CDMAcontroller& rCont_dma)

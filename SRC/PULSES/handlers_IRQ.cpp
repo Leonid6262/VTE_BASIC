@@ -5,6 +5,12 @@
 
 CProxyHandlerTIMER::CProxyHandlerTIMER(){}; // Прокси для доступа к Timers IRQ Handlers
 
+CProxyHandlerTIMER& CProxyHandlerTIMER::getInstance() 
+{
+  static CProxyHandlerTIMER instance;
+  return instance;
+}
+
 void CProxyHandlerTIMER::set_pointers(CSIFU* pPuls, CREM_OSC* pRem_osc)  
 {
   this->pPuls = pPuls;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "LPC407x_8x_177x_8x.h"
+#include "terminalUartDriver.hpp"
 
 #include <string>
 #include <vector>
@@ -12,7 +12,10 @@ class CTERMINAL{
   
 public:
   
-  CTERMINAL(LPC_UART_TypeDef*);
+  CTERMINAL(CTerminalUartDriver& drv);
+  
+  void initMenu(unsigned short* Irotor, unsigned short* Urotor,
+                short* Istat, float* coeff, bool* flag); 
   
   // Типы переменных
   enum VarType { NONE, USHORT, SHORT, FLOAT, BOOL };
@@ -29,8 +32,7 @@ public:
     
     MenuNode(const std::string& t, std::vector<MenuNode> ch)
     : title(t), children(std::move(ch)) {}
-    
-    
+  
   };
   
   struct Frame {
@@ -38,8 +40,7 @@ public:
     uint8_t index;
   };
   
-  CTERMINAL(unsigned short* Irotor, unsigned short* Urotor,
-            short* Istat, float* coeff, bool* flag);
+  void get_key();
   
   void render() const;
   void up();
@@ -47,17 +48,19 @@ public:
   void enter();
   void esc();
   void edit(int delta);
-  
-  void basic();
-  
+ 
 private:
   
-  LPC_UART_TypeDef* UART;
+  CTerminalUartDriver& uartDrv;
   
   std::vector<MenuNode> topMenu;
   std::vector<MenuNode>* currentList;
-  uint8_t selectedIndex;
   std::stack<Frame> history;
+  
+  unsigned char cur_key;
+  unsigned char  selectedIndex;
+  unsigned char indexTop = 0;     // индекс верхней строки окна
+  unsigned char cursorPos = 0;    // 0 = верхняя строка, 1 = нижняя строка
   
   
 };

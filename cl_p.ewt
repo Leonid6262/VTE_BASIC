@@ -2924,6 +2924,9 @@
             <file>
                 <name>$PROJ_DIR$\SRC\TERMINAL\terminal.cpp</name>
             </file>
+            <file>
+                <name>$PROJ_DIR$\SRC\TERMINAL\terminalUartDriver.cpp</name>
+            </file>
         </group>
         <file>
             <name>$PROJ_DIR$\SRC\_factory.cpp</name>

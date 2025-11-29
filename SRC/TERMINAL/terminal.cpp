@@ -1,6 +1,6 @@
 #include "terminal.hpp"
 
-CTERMINAL::CTERMINAL(LPC_UART_TypeDef* UART) : UART(UART){}
+CTERMINAL::CTERMINAL(CTerminalUartDriver& uartDrv) : uartDrv(uartDrv) {}
 
 // Конструкторы узла
 CTERMINAL::MenuNode::MenuNode(const std::string& t) : title(t) {}
@@ -8,8 +8,8 @@ CTERMINAL::MenuNode::MenuNode(const std::string& t, void* v, VarType vt, bool ed
     : title(t), value(v), type(vt), editable(edit) {}
 
 // Конструктор терминала
-CTERMINAL::CTERMINAL(unsigned short* Irotor, unsigned short* Urotor,
-                     short* Istat, float* coeff, bool* flag) {
+void CTERMINAL::initMenu(unsigned short* Irotor, unsigned short* Urotor, 
+                         short* Istat, float* coeff, bool* flag) {
     topMenu = {
         { "ИНДИКАЦИЯ", {
             { "Irotor", Irotor, USHORT, false },
@@ -28,37 +28,70 @@ CTERMINAL::CTERMINAL(unsigned short* Irotor, unsigned short* Urotor,
     selectedIndex = 0;
 }
 
-// Отображение меню
+void CTERMINAL::get_key()
+{
+  uartDrv.poll_rx(cur_key);
+}
+
+// Отображение двух строк
 void CTERMINAL::render() const {
-    std::cout << "=== MENU ===\n";
-    for (size_t i = 0; i < currentList->size(); ++i) {
-        const auto& node = (*currentList)[i];
-        std::cout << (i == selectedIndex ? " > " : "   ")
-                  << node.title;
+    std::string out;
+
+    for (int line = 0; line < 2; ++line) {
+        unsigned char idx = indexTop + line;
+        if (idx >= currentList->size()) break;
+
+        const auto& node = (*currentList)[idx];
+
+        // курсор
+        out += (cursorPos == line ? ">" : " ");
+
+        out += node.title;
 
         if (node.value) {
-            std::cout << " = ";
+            out += " ";
             switch (node.type) {
-                case USHORT: std::cout << *(static_cast<unsigned short*>(node.value)); break;
-                case SHORT:  std::cout << *(static_cast<short*>(node.value)); break;
-                case FLOAT:  std::cout << *(static_cast<float*>(node.value)); break;
-                case BOOL:   std::cout << (*(static_cast<bool*>(node.value)) ? "true" : "false"); break;
+                case USHORT: out += std::to_string(*(unsigned short*)node.value); break;
+                case SHORT:  {
+                    short v = *(short*)node.value;
+                    out += (v >= 0 ? "+" : "") + std::to_string(v);
+                } break;
+                case FLOAT: {
+                    float v = *(float*)node.value;
+                    if (v >= 0) out += "+";
+                    char buf[16];
+                    snprintf(buf, sizeof(buf), "%.2f", v);
+                    out += buf;
+                } break;
+                case BOOL: out += (*(bool*)node.value ? "true" : "false"); break;
                 default: break;
             }
-            if (node.editable) std::cout << " [edit]";
+            if (node.editable) out += " <";
         }
-        std::cout << "\n";
+
+        out += "\r"; // только CR, без LF
     }
-    std::cout << "============\n";
-}
 
-// Навигация
+    uartDrv.sendBuffer((const unsigned char*)out.c_str());//, out.size());
+}
+// Навигация вверх
 void CTERMINAL::up() {
-    if (selectedIndex > 0) selectedIndex--;
+    if (cursorPos == 1) {
+        cursorPos = 0; // просто перемещаем курсор на верхнюю строку
+    } else if (indexTop > 0) {
+        indexTop--;    // сдвигаем окно вверх
+    }
+    render();
 }
 
+// Навигация вниз
 void CTERMINAL::down() {
-    if (selectedIndex + 1 < currentList->size()) selectedIndex++;
+    if (cursorPos == 0) {
+        cursorPos = 1; // курсор на нижнюю строку
+    } else if (indexTop + 2 < currentList->size()) {
+        indexTop++;    // сдвигаем окно вниз
+    }
+    render();
 }
 
 void CTERMINAL::enter() {
@@ -93,11 +126,3 @@ void CTERMINAL::edit(int delta) {
     }
 }
 
-
-
-
-
-void CTERMINAL::basic()
-{
-  
-}

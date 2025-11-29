@@ -16,6 +16,7 @@
 #include "SIFU.hpp"
 #include "puls_calc.hpp"
 #include "handlers_IRQ.hpp"
+#include "terminalUartDriver.hpp"
 #include "terminal.hpp"
 
 class CFactory {

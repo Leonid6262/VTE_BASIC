@@ -11,12 +11,8 @@ class CProxyHandlerTIMER
 {
 public:
   
-  static CProxyHandlerTIMER& getInstance() 
-  {
-    static CProxyHandlerTIMER instance;
-    return instance;
-  }
-  
+  static CProxyHandlerTIMER& getInstance(); 
+
   CSIFU* pPuls;
   CREM_OSC* pRem_osc;
  
