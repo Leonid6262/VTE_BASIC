@@ -33,7 +33,7 @@ void main(void)
     din_cpu.input_Pi0();        // Чтение состояния дискретных входов контроллера Pi0   
     spi_ports.rw();             // Запись в дискретные выходы и чтение дискретных входов доступных по SPI    
     rt_clock.update_now();      // Обновление экземпляра структуы SDateTime данными из RTC    
-    terminal.render();          // Пультовый терминал
+    terminal.get_key();          // Пультовый терминал
     Pause_us(3);
   } 
 }
