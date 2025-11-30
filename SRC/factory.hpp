@@ -22,7 +22,7 @@
 class CFactory {
 public:
     
-    static void init_settings();
+    static bool load_settings();
   
     static CUART initRS485_01();
     static CUART initRS485_02();
@@ -42,9 +42,7 @@ public:
     static CEMAC_DRV createEMACdrv();
     
     static CDMAcontroller createDMAc();
-    
-    static CPULSCALC createPULSCALC();
-    
+   
     static CRTC createRTC();
     
     static CTERMINAL createTERMINAL();

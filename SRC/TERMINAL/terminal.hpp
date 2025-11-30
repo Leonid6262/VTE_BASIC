@@ -50,7 +50,7 @@ private:
   
   CTerminalUartDriver& uartDrv;
   
-  std::vector<MenuNode> topMenu;
+  std::vector<MenuNode> Menu;
   std::vector<MenuNode>* currentList;
   std::stack<Frame> history;
   

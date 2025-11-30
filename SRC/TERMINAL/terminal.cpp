@@ -19,7 +19,24 @@ CTERMINAL::MenuNode::MenuNode(const std::string& t, void* v, VarType vt, bool ed
 
 // Конструктор дерева
 void CTERMINAL::initMenu() {
-    topMenu = {
+       Menu = {
+        { "ИНДИКАЦИЯ",{
+          { "АНАЛОГОВАЯ",},
+          { "ДИСКРЕТНАЯ",},
+        }},
+        { "УСТАВКИ",{
+          { "РЕГУЛЯТОРОВ",{
+            { "РЕГУЛЯТОР ТОКА",},
+            { "РЕГУЛЯТОР COS", },
+            { "РЕГУЛЯТОР РМ",  },
+          }},
+          { "ОГРАНИЧЕНИЙ",},
+          { "АВАРИЙНЫЕ",  },
+        }},
+        { "НАЛАДКА",}
+    }; 
+  
+/*  topMenu = {
         { "ИНДИКАЦИЯ", {
             { "Irotor", &Irotor, USHORT, false },
             { "Urotor", &Urotor, USHORT, false },
@@ -32,8 +49,8 @@ void CTERMINAL::initMenu() {
             { "Enable", &flag, BOOL, true }
         }}
     }; 
-
-    currentList = &topMenu;
+*/
+    currentList = &Menu;
     selectedIndex = 0;
 }
 
