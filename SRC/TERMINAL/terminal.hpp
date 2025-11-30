@@ -1,6 +1,7 @@
 #pragma once
 
 #include "terminalUartDriver.hpp"
+#include "SIFU.hpp"
 
 #include <string>
 #include <vector>
@@ -11,6 +12,10 @@
 class CTERMINAL{ 
   
 public:
+  
+  struct SDependencies {
+    CSIFU& rSifu;
+  };
   
   CTERMINAL(CTerminalUartDriver& drv);
   

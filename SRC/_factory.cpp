@@ -42,7 +42,6 @@ void CFactory::start_puls_system(CDMAcontroller& rCont_dma)
   static CADC adc(init_spi1.getTypeDef());                              // Внешнее ADC. Подключено к SPI-1
   static CPULSCALC puls_calc(adc);                                      // Измерение и обработка всех аналоговых сигналов.
   static CSIFU sifu(puls_calc);                                         // СИФУ.
-  
   CSET_SPI init_dma_spi(CSET_SPI::ESPIInstance::SPI_2);                 // Конфигурация SPI-2 для WiFi на ESP32
   static CREM_OSC rem_osc(                                              // Дистанционный осциллограф (WiFi модуль на ESP32).
                           rCont_dma,                                            //Контроллер DMA
