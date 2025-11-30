@@ -20,20 +20,20 @@ CTERMINAL::MenuNode::MenuNode(const std::string& t, void* v, VarType vt, bool ed
 // Конструктор дерева
 void CTERMINAL::initMenu() {
        Menu = {
-        { "ИНДИКАЦИЯ",{
-          { "АНАЛОГОВАЯ",},
-          { "ДИСКРЕТНАЯ",},
+        {"ИНДИКАЦИЯ",{
+          {"АНАЛОГОВАЯ",},
+          {"ДИСКРЕТНАЯ",},
         }},
-        { "УСТАВКИ",{
-          { "РЕГУЛЯТОРОВ",{
-            { "РЕГУЛЯТОР ТОКА",},
-            { "РЕГУЛЯТОР COS", },
-            { "РЕГУЛЯТОР РМ",  },
+        {"УСТАВКИ",{
+          {"РЕГУЛЯТОРОВ",{
+            {"РЕГУЛЯТОР ТОКА",},
+            {"РЕГУЛЯТОР COS", },
+            {"РЕГУЛЯТОР РМ",  },
           }},
-          { "ОГРАНИЧЕНИЙ",},
-          { "АВАРИЙНЫЕ",  },
+          {"ОГРАНИЧЕНИЙ",},
+          {"АВАРИЙНЫЕ",  },
         }},
-        { "НАЛАДКА",}
+        {"НАЛАДКА",}
     }; 
   
 /*  topMenu = {
@@ -80,51 +80,51 @@ void CTERMINAL::get_key()
 // Отображение двух строк
 void CTERMINAL::render() const 
 {
-  std::string out;
+  std::string string_line;
   
-  for (int line = 0; line < 2; ++line) 
+  for (int n_line = 0; n_line < 2; ++n_line) 
   {
-    unsigned char idx = indexTop + line;
+    unsigned char idx = indexTop + n_line;
     if (idx >= currentList->size()) break;
     
     const auto& node = (*currentList)[idx];
     
     // курсор
-    out += (cursorPos == line ? ">" : " ");
+    string_line += (cursorPos == n_line ? ">" : " ");
     
-    out += node.title;
+    string_line += node.title;
     
     if (node.value) 
     {
-      out += " ";
+      string_line += " ";
       switch (node.type) 
       {
-      case USHORT: out += std::to_string(*(unsigned short*)node.value); break;
+      case USHORT: string_line += std::to_string(*(unsigned short*)node.value); break;
       case SHORT:  
         {
           short v = *(short*)node.value;
-          out += (v >= 0 ? "+" : "") + std::to_string(v);
+          string_line += (v >= 0 ? "+" : "") + std::to_string(v);
         } 
         break;
       case FLOAT: 
         {
           float v = *(float*)node.value;
-          if (v >= 0) out += "+";
+          if (v >= 0) string_line += "+";
           char buf[16];
           snprintf(buf, sizeof(buf), "%.2f", v);
-          out += buf;
+          string_line += buf;
         } 
         break;
       case BOOL: 
-        out += (*(bool*)node.value ? "true" : "false"); 
+        string_line += (*(bool*)node.value ? "true" : "false"); 
         break;
       default: break;
       }
-      if (node.editable) out += " <";
+      if (node.editable) string_line += " <";
     }
-    out += "\r"; // только CR, без LF
+    string_line += "\r"; // только CR, без LF
   } 
-  uartDrv.sendBuffer((const unsigned char*)out.c_str());//, out.size());
+  uartDrv.sendBuffer((const unsigned char*)string_line.c_str());//, out.size());
 }
 
 void CTERMINAL::up() 

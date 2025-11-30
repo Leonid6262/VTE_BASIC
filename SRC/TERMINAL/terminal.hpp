@@ -32,11 +32,6 @@ public:
     MenuNode(const std::string& t, std::vector<MenuNode> ch) : title(t), children(std::move(ch)) {} 
   };
   
-  struct Frame {
-    std::vector<MenuNode>* list;
-    unsigned char index;
-  };
-  
   void get_key();
   
   void render() const;
@@ -49,6 +44,12 @@ public:
 private:
   
   CTerminalUartDriver& uartDrv;
+  
+  struct Frame 
+  {
+    std::vector<MenuNode>* list;
+    unsigned char index;
+  };  
   
   std::vector<MenuNode> Menu;
   std::vector<MenuNode>* currentList;
@@ -75,6 +76,5 @@ private:
   unsigned char selectedIndex;
   unsigned char indexTop = 0;     // индекс верхней строки окна
   unsigned char cursorPos = 0;    // 0 = верхняя строка, 1 = нижняя строка
-  
-  
+
 };

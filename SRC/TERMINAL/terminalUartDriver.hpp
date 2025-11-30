@@ -13,13 +13,14 @@ public:
   
   // Опрос приёма одного байта (возвращает true если байт есть)
   bool poll_rx(uint8_t& byte);
-
+  
   void irq_handler(); 
   void init(LPC_UART_TypeDef*);
   
 private:
   
-  struct RingBuffer {
+  struct RingBuffer 
+  {
     static constexpr unsigned short SIZE = 128;
     unsigned char buf[SIZE];
     unsigned short head = 0;
@@ -28,15 +29,19 @@ private:
     bool empty() const { return head == tail; }
     bool full()  const { return ((head + 1) % SIZE) == tail; }
     
-    void push(unsigned char b) {
-      if (!full()) {
+    void push(unsigned char b) 
+    {
+      if (!full()) 
+      {
         buf[head] = b;
         head = (head + 1) % SIZE;
       }
     }
     
-    bool pop(unsigned char& b) {
-      if (!empty()) {
+    bool pop(unsigned char& b) 
+    {
+      if (!empty()) 
+      {
         b = buf[tail];
         tail = (tail + 1) % SIZE;
         return true;
