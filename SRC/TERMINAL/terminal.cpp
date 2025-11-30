@@ -1,4 +1,5 @@
 #include "terminal.hpp"
+#include "tree.hpp"
 
 unsigned short Irotor = 123;
 unsigned short Urotor = 456;
@@ -14,45 +15,15 @@ CTERMINAL::CTERMINAL(CTerminalUartDriver& uartDrv) : uartDrv(uartDrv)
 
 // Конструкторы узла
 CTERMINAL::MenuNode::MenuNode(const std::string& t) : title(t) {}
-CTERMINAL::MenuNode::MenuNode(const std::string& t, void* v, VarType vt, bool edit)
-    : title(t), value(v), type(vt), editable(edit) {}
+CTERMINAL::MenuNode::MenuNode(const std::string& t, void* v, VarType vt, bool edit) : title(t), value(v), type(vt), editable(edit) {}
 
 // Конструктор дерева
-void CTERMINAL::initMenu() {
-       Menu = {
-        {"ИНДИКАЦИЯ",{
-          {"АНАЛОГОВАЯ",},
-          {"ДИСКРЕТНАЯ",},
-        }},
-        {"УСТАВКИ",{
-          {"РЕГУЛЯТОРОВ",{
-            {"РЕГУЛЯТОР ТОКА",},
-            {"РЕГУЛЯТОР COS", },
-            {"РЕГУЛЯТОР РМ",  },
-          }},
-          {"ОГРАНИЧЕНИЙ",},
-          {"АВАРИЙНЫЕ",  },
-        }},
-        {"НАЛАДКА",}
-    }; 
-  
-/*  topMenu = {
-        { "ИНДИКАЦИЯ", {
-            { "Irotor", &Irotor, USHORT, false },
-            { "Urotor", &Urotor, USHORT, false },
-            { "Istat",  &Istat,  SHORT,  false }
-        }},
-        { "УСТАВКИ", {
-            { "Coeff", &coeff, FLOAT, true }
-        }},
-        { "НАЛАДКА", {
-            { "Enable", &flag, BOOL, true }
-        }}
-    }; 
-*/
-    currentList = &Menu;
-    selectedIndex = 0;
-}
+void CTERMINAL::initMenu()
+{
+  MENU = makeMENU();
+  currentList = &MENU;
+  selectedIndex = 0;
+}  
 
 void CTERMINAL::get_key()
 {

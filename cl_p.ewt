@@ -2868,6 +2868,9 @@
                 <name>$PROJ_DIR$\SRC\DEVICE_DATA\AdcStorage.cpp</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\SRC\DEVICE_DATA\AdcStorage.hpp</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\SRC\DEVICE_DATA\dIOStorage.cpp</name>
             </file>
         </group>
@@ -2927,6 +2930,9 @@
             <file>
                 <name>$PROJ_DIR$\SRC\TERMINAL\terminalUartDriver.cpp</name>
             </file>
+            <file>
+                <name>$PROJ_DIR$\SRC\TERMINAL\tree.hpp</name>
+            </file>
         </group>
         <file>
             <name>$PROJ_DIR$\SRC\_factory.cpp</name>
@@ -2944,10 +2950,16 @@
             <name>$PROJ_DIR$\SRC\din_cpu.cpp</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\SRC\IntPriority.hpp</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\SRC\rtc.cpp</name>
         </file>
         <file>
             <name>$PROJ_DIR$\SRC\settings_eep.cpp</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\SRC\settings_eep.hpp</name>
         </file>
     </group>
     <file>

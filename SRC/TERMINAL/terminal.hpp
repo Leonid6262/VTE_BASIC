@@ -51,7 +51,7 @@ private:
     unsigned char index;
   };  
   
-  std::vector<MenuNode> Menu;
+  std::vector<MenuNode> MENU;
   std::vector<MenuNode>* currentList;
   std::stack<Frame> history;
   
