@@ -24,12 +24,10 @@ void main(void)
   static auto terminal  = CFactory::createTERMINAL();   // Пультовый терминал. Подключен к UART-0 (см. CFactory)
   
   CFactory::start_puls_system(cont_dma);                // Запуск СИФУ и всех её зависимостей. (см. CFactory)
-  
+ 
   CDIN_STORAGE::UserLedOff();                           // Визуальный контроль окончания инициализации
   
-  
   const unsigned char data[] = {"5Ф\r"};
-  
   
   while(true)
   {                

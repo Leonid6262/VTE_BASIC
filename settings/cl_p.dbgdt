@@ -157,7 +157,7 @@
                     <item>din_cpu</item>
                     <item>spi_ports</item>
                     <item>terminal</item>
-                    <item></item>
+                    <item />
                 </expressions>
                 <col-names>
                     <item>Expression</item>
