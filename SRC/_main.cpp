@@ -28,7 +28,7 @@ void main(void)
   CDIN_STORAGE::UserLedOff();                           // Визуальный контроль окончания инициализации
   
   
-  const unsigned char data[] = {"5F\r"};
+  const unsigned char data[] = {"5Ф\r"};
   
   
   while(true)
@@ -38,7 +38,7 @@ void main(void)
     spi_ports.rw();             // Запись в дискретные выходы и чтение дискретных входов доступных по SPI    
     rt_clock.update_now();      // Обновление экземпляра структуы SDateTime данными из RTC    
     //terminal.get_key();         // Пультовый терминал
-    CTerminalUartDriver::getInstance().sendBuffer(data, 3);
+    CTerminalUartDriver::getInstance().sendBuffer(data, 4);
     Pause_us(10000);
   } 
 }
