@@ -1,10 +1,10 @@
-#include "uart.hpp"
+#include "set_uart.hpp"
 
-CUART::CUART(EUartInstance UN) 
+CSET_UART::CSET_UART(EUartInstance UN) 
 {   
   switch(UN)
   {
-  case EUartInstance::UART_TERMINAL:
+  case EUartInstance::UART_0:
     UART = LPC_UART0; 
     LPC_IOCON->P0_2  = IOCON_U0_TXD;       // U0_TXD
     LPC_IOCON->P0_3  = IOCON_U0_RXD;       // U0_RXD
@@ -16,7 +16,7 @@ CUART::CUART(EUartInstance UN)
     UART->DLL   = baud_19200.DLL;
     UART->FDR   = baud_19200.FDR;
     break;
-  case EUartInstance::UART_RS485_01:  
+  case EUartInstance::UART_1:  
     UART = LPC_UART2;
     LPC_IOCON->P2_6     = IOCON_U2_OE;     // U2_OE
     LPC_IOCON->P2_8     = IOCON_U2_TXD;    // U2_TXD
@@ -31,7 +31,7 @@ CUART::CUART(EUartInstance UN)
     UART->DLL   = baud_115200.DLL;
     UART->FDR   = baud_115200.FDR;
     break;
-  case EUartInstance::UART_RS485_02:     
+  case EUartInstance::UART_2:     
     UART = LPC_UART3;
     LPC_IOCON->P1_30    = IOCON_U3_OE;     // U3_OE
     LPC_IOCON->P4_28    = IOCON_U3_TXD;    // U3_TXD
@@ -46,22 +46,21 @@ CUART::CUART(EUartInstance UN)
     UART->DLL   = baud_115200.DLL;
     UART->FDR   = baud_115200.FDR;
     break;
-  }  
-  
+  }    
   UART->LCR   = LCR_DLAB_OFF; // b7 - DLAB откл., чётность откл., 1-стоп бит, символ 8бит 
   UART->FCR   = FIFOEN;       // FIFO. b2-очистка TXFIFO, b1-очистка RXFIFO, b0-вкл FIFO  
   UART->TER   = TXEN;         // Разрешение передачи   
   while (UART->LSR & RDR)
   {
-    int tmp = UART->RBR; // Очистка приёмника
+    unsigned int tmp = UART->RBR; // Очистка приёмника
   }  
-  while (!(UART->LSR & THRE)); // Очистка передатчика
+  while (!(UART->LSR & THRE)){}; // Очистка передатчика
 }
 
-LPC_UART_TypeDef* CUART::getTypeDef() const
-{
-  return UART;
-}
+//LPC_UART_TypeDef* CSET_UART::getTypeDef() const
+//{
+//  return UART;
+//}
 
 
 

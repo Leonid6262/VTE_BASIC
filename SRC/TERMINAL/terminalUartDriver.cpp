@@ -2,7 +2,7 @@
 
 CTerminalUartDriver::CTerminalUartDriver(){};
 
-void CTerminalUartDriver::init(LPC_UART_TypeDef* UART)
+void CTerminalUartDriver::init(LPC_UART_TypeDef* UART, IRQn_Type UART_IRQ )
 {
   this->UART = UART;
   txbuf.head = 0;
@@ -10,7 +10,7 @@ void CTerminalUartDriver::init(LPC_UART_TypeDef* UART)
   // Настройка прерываний
   UART->IER = 0;
   UART->IER |= THRE_I; // b1-THRE
-  NVIC_EnableIRQ(UART0_IRQn);
+  NVIC_EnableIRQ(UART_IRQ);
 }
 
 CTerminalUartDriver& CTerminalUartDriver::getInstance() 
@@ -114,11 +114,4 @@ void CTerminalUartDriver::irq_handler()
   }
 }
 
-extern "C"  
-{
-  void UART0_IRQHandler(void)
-  {
-    CTerminalUartDriver::getInstance().irq_handler();
-  }
-}
 

@@ -1,7 +1,7 @@
 #include "factory.hpp"
 
-CUART CFactory::initRS485_01()          { return CUART(CUART::EUartInstance::UART_RS485_01);     } // For the control class
-CUART CFactory::initRS485_02()          { return CUART(CUART::EUartInstance::UART_RS485_02);     } // For the control class
+CSET_UART CFactory::initRS485_01()      { return CSET_UART(CSET_UART::EUartInstance::UART_1);     } // For the control class
+CSET_UART CFactory::initRS485_02()      { return CSET_UART(CSET_UART::EUartInstance::UART_2);     } // For the control class
 CCAN CFactory::initCAN1()               { return CCAN(CCAN::ECAN_Id_Instance::CAN1_Id);          } // For the control class
 CCAN CFactory::initCAN2()               { return CCAN(CCAN::ECAN_Id_Instance::CAN2_Id);          } // For the control class
 CDAC0 CFactory::createDAC0()            { return CDAC0();                                        } // For the control class
@@ -30,11 +30,12 @@ CSPI_ports CFactory::createSPIports()
 
 CTERMINAL CFactory::createTERMINAL()
 {  
-  CUART uart(CUART::EUartInstance::UART_TERMINAL);                              // Конфигурация UART-0 - пультовый терминал
+  CSET_UART uart(CSET_UART::EUartInstance::UART_0);                             // Конфигурация UART-0 - пультовый терминал
   CTerminalUartDriver& pUartDriver = CTerminalUartDriver::getInstance();
-  pUartDriver.init(uart.getTypeDef());                                          // Инициализация драйвера UART-0
+  pUartDriver.init(LPC_UART0, UART0_IRQn);                                      // Инициализация драйвера UART-0
   return CTERMINAL(pUartDriver);                                                // Пультовый терминал. Подвязан к UART-0
 }
+extern "C" void UART0_IRQHandler(void) { CTerminalUartDriver::getInstance().irq_handler(); } // Вызов обработчика UART-0
 
 void CFactory::start_puls_system(CDMAcontroller& rCont_dma)
 {
@@ -55,4 +56,5 @@ void CFactory::start_puls_system(CDMAcontroller& rCont_dma)
   CProxyHandlerTIMER::getInstance().set_pointers(&sifu, &rem_osc);      // Proxy Singleton доступа к Handler TIMER. 
   sifu.init_and_start();                                                // Старт SIFU
 }
+
 

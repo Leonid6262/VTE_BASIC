@@ -2196,10 +2196,10 @@
                 <name>$PROJ_DIR$\SRC\SERIAL\set_spi.cpp</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\SRC\SERIAL\spi_ports.cpp</name>
+                <name>$PROJ_DIR$\SRC\SERIAL\set_uart.cpp</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\SRC\SERIAL\uart.cpp</name>
+                <name>$PROJ_DIR$\SRC\SERIAL\spi_ports.cpp</name>
             </file>
         </group>
         <group>

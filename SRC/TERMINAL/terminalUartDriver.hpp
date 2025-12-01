@@ -10,7 +10,7 @@
 class CTerminalUartDriver {
 public:
   
-  void init(LPC_UART_TypeDef* UART);
+  void init(LPC_UART_TypeDef*, IRQn_Type);
   static CTerminalUartDriver& getInstance();
   
   bool sendBuffer(const unsigned char* data, unsigned char len);

@@ -2,7 +2,7 @@
 
 #include "crc16.hpp"
 #include "settings_eep.hpp"
-#include "uart.hpp"
+#include "set_uart.hpp"
 #include "set_spi.hpp"
 #include "spi_ports.hpp"
 #include "can.hpp"
@@ -24,8 +24,8 @@ public:
     
     static bool load_settings();
   
-    static CUART initRS485_01();
-    static CUART initRS485_02();
+    static CSET_UART initRS485_01();
+    static CSET_UART initRS485_02();
     
     static CCAN initCAN1();
     static CCAN initCAN2();

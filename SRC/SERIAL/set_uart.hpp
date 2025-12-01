@@ -3,18 +3,18 @@
 #include "LPC407x_8x_177x_8x.h"
 #include "system_LPC177x.h"
 
-class CUART{
+class CSET_UART{
 public:    
   enum class EUartInstance {
-    UART_TERMINAL,              // UART0
-    UART_RS485_01,              // UART2
-    UART_RS485_02               // UART3
+    UART_0,              
+    UART_1,             
+    UART_2              
   };
   
-  CUART(EUartInstance);
+  CSET_UART(EUartInstance);
   
-  LPC_UART_TypeDef* getTypeDef() const;
-
+  //LPC_UART_TypeDef* getTypeDef() const;
+  
 private: 
     // Настройки скорости
     struct SBaudRateSettings {
@@ -60,6 +60,5 @@ private:
   };  
   
   LPC_UART_TypeDef* UART;
-  
 };
 
