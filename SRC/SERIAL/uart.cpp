@@ -47,6 +47,7 @@ CUART::CUART(EUartInstance UN)
     UART->FDR   = baud_115200.FDR;
     break;
   }  
+  
   UART->LCR   = LCR_DLAB_OFF; // b7 - DLAB откл., чётность откл., 1-стоп бит, символ 8бит 
   UART->FCR   = FIFOEN;       // FIFO. b2-очистка TXFIFO, b1-очистка RXFIFO, b0-вкл FIFO  
   UART->TER   = TXEN;         // Разрешение передачи   
@@ -54,6 +55,7 @@ CUART::CUART(EUartInstance UN)
   {
     int tmp = UART->RBR; // Очистка приёмника
   }  
+  while (!(UART->LSR & THRE)); // Очистка передатчика
 }
 
 LPC_UART_TypeDef* CUART::getTypeDef() const

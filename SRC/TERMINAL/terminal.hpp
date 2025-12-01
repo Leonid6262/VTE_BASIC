@@ -78,6 +78,8 @@ private:
     Escape = 0x1B,
   };
   
+  unsigned char cur_key;
+    
   unsigned char selectedIndex;
   unsigned char indexTop = 0;     // индекс верхней строки окна
   unsigned char cursorPos = 0;    // 0 = верхняя строка, 1 = нижняя строка

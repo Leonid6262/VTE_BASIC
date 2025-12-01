@@ -45,6 +45,7 @@ void CTERMINAL::get_key()
       escape();
       break;
     }
+    cur_key = input_key;
   }
 }
 
@@ -95,7 +96,7 @@ void CTERMINAL::render() const
     }
     string_line += "\r"; // только CR, без LF
   } 
-  uartDrv.sendBuffer((const unsigned char*)string_line.c_str());//, out.size());
+  //uartDrv.sendBuffer((unsigned char*)string_line.c_str());//, out.size());
 }
 
 void CTERMINAL::up() 

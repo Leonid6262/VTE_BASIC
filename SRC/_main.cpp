@@ -11,8 +11,7 @@ void main(void)
 {                   
   NVIC_SetPriorityGrouping(Priorities::G4S8);           // Распределение векторов по группам. Реализовано в файле IntPriority.h
   Timers_Initializing();                                // Инициализация таймеров.
-  
-  static auto terminal  = CFactory::createTERMINAL();   // Пультовый терминал. Подключен к UART-0 (см. CFactory)  
+    
   if(!CFactory::load_settings())                        // Создание Singleton класса CEEPSettings и загрузка уставок (RAM <- EEPROM)   
   { 
     /*  "Ошибка CRC. Используются уставки по умолчанию!" */ 
@@ -22,10 +21,15 @@ void main(void)
   static auto din_cpu   = CFactory::createDINcpu();     // Дискретные входы контроллера (порты Pi0 и Pi1 по аналогии с СМ3)                                                        // Выходы контроллера (порт Po0 по аналогии с СМ3 в dIOStorage.hpp)
   static auto rt_clock  = CFactory::createRTC();        // Системные часы  
   static auto cont_dma  = CFactory::createDMAc();       // Управление каналами DMA. 
+  static auto terminal  = CFactory::createTERMINAL();   // Пультовый терминал. Подключен к UART-0 (см. CFactory)
   
   CFactory::start_puls_system(cont_dma);                // Запуск СИФУ и всех её зависимостей. (см. CFactory)
   
   CDIN_STORAGE::UserLedOff();                           // Визуальный контроль окончания инициализации
+  
+  
+  const unsigned char data[] = {"5F\r"};
+  
   
   while(true)
   {                
@@ -33,8 +37,9 @@ void main(void)
     din_cpu.input_Pi0();        // Чтение состояния дискретных входов контроллера Pi0   
     spi_ports.rw();             // Запись в дискретные выходы и чтение дискретных входов доступных по SPI    
     rt_clock.update_now();      // Обновление экземпляра структуы SDateTime данными из RTC    
-    terminal.get_key();         // Пультовый терминал
-    Pause_us(3);
+    //terminal.get_key();         // Пультовый терминал
+    CTerminalUartDriver::getInstance().sendBuffer(data, 3);
+    Pause_us(10000);
   } 
 }
 

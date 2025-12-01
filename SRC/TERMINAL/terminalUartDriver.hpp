@@ -2,52 +2,38 @@
 
 #include "LPC407x_8x_177x_8x.h"
 
-class CTerminalUartDriver
-{
+#include <cstdint>
+
+// Singleton класс драйвера UART для терминала
+// Использует прерывание по FIFO empty и всю глубину (16 byte) FIFO
+// Для 16 байтных строк терминала: "0123456789012345\r" - одно прерывание дописывающее \r
+class CTerminalUartDriver {
 public:
   
-  static CTerminalUartDriver& getInstance(); 
+  void init(LPC_UART_TypeDef* UART);
+  static CTerminalUartDriver& getInstance();
   
-  // Отправка ровно 16 байт (возвращает false если очередь переполнена)
-  bool sendBuffer(const uint8_t* data);
-  
-  // Опрос приёма одного байта (возвращает true если байт есть)
-  bool poll_rx(uint8_t& byte);
-  
-  void irq_handler(); 
-  void init(LPC_UART_TypeDef*);
+  bool sendBuffer(const unsigned char* data, unsigned char len);
+  bool poll_rx(unsigned char& byte);
+  void irq_handler();
   
 private:
   
-  struct RingBuffer 
-  {
-    static constexpr unsigned short SIZE = 128;
+  static constexpr unsigned char UART_FIFO_SIZE = 16;         // глубина аппаратного FIFO
+  static constexpr unsigned int THRE_F          = 1UL << 5;   // THRE flag. FIFO empty
+  static constexpr unsigned int THRE_I          = 1UL << 1;   // THRE interrupt. FIFO empty
+  static constexpr unsigned int RDR_F           = 1UL << 0;   // RDR flag. Есть данные для чтения
+  
+  // Внутренний кольцевой буфер
+  struct RingBuffer {
+    static constexpr int SIZE = 256;
     unsigned char buf[SIZE];
     unsigned short head = 0;
     unsigned short tail = 0;
     
-    bool empty() const { return head == tail; }
-    bool full()  const { return ((head + 1) % SIZE) == tail; }
-    
-    void push(unsigned char b) 
-    {
-      if (!full()) 
-      {
-        buf[head] = b;
-        head = (head + 1) % SIZE;
-      }
-    }
-    
-    bool pop(unsigned char& b) 
-    {
-      if (!empty()) 
-      {
-        b = buf[tail];
-        tail = (tail + 1) % SIZE;
-        return true;
-      }
-      return false;
-    }
+    bool push(unsigned char b);
+    bool pop(unsigned char& b);
+    bool empty() const;
   };
   
   RingBuffer txbuf;
@@ -59,3 +45,4 @@ private:
   CTerminalUartDriver& operator=(const CTerminalUartDriver&) = delete; 
   
 };
+  
