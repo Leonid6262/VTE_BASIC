@@ -3,28 +3,37 @@
 
 CTERMINAL::CTERMINAL(CTerminalUartDriver& uartDrv) : uartDrv(uartDrv) 
 {
-  initMenu();
+    // создание меню
+    MENU = makeMENU();
+    currentList = &MENU;
+    selectedIndex = 0;
+    cursorPos = 0;
+
+    // очистка экрана
+    unsigned char clr_data[] = {"                \r\n"};
+    uartDrv.sendBuffer(clr_data, sizeof(clr_data));
+    uartDrv.sendBuffer(clr_data, sizeof(clr_data));
+    uartDrv.sendBuffer(clr_data, sizeof(clr_data));
+
+    // выключение светодиода
+    unsigned char led_off[] = { static_cast<unsigned char>(ELED::LED_OFF), '\r' };
+    uartDrv.sendBuffer(led_off, sizeof(led_off));
+
+    // первая отрисовка меню
+    render_menu();
 }
 
 // Конструкторы узла
 CTERMINAL::MenuNode::MenuNode(const std::string& t) : title(t) {}
 CTERMINAL::MenuNode::MenuNode(const std::string& t, void* v, VarType vt, bool edit) : title(t), value(v), type(vt), editable(edit) {}
 
-// Конструктор дерева
-void CTERMINAL::initMenu()
-{
-  MENU = makeMENU();
-  currentList = &MENU;
-  selectedIndex = 0;
-  cursorPos = 0;
-  unsigned char clr_data[] = {"                \r\n"};
-  uartDrv.sendBuffer(clr_data, sizeof(clr_data));
-  uartDrv.sendBuffer(clr_data, sizeof(clr_data));
-  uartDrv.sendBuffer(clr_data, sizeof(clr_data));
-  unsigned char led_off[] = { static_cast<unsigned char>(ELED::LED_OFF), '\r' };
-  uartDrv.sendBuffer(led_off, sizeof(led_off));
-  render_menu();
-}  
+// Определения статических членов
+std::vector<CTERMINAL::MenuNode> CTERMINAL::MENU;
+std::vector<CTERMINAL::MenuNode>* CTERMINAL::currentList = nullptr;
+std::stack<CTERMINAL::Frame> CTERMINAL::history;
+unsigned char CTERMINAL::selectedIndex = 0; 
+unsigned char CTERMINAL::indexTop = 0;
+unsigned char CTERMINAL::cursorPos = 0; 
 
 void CTERMINAL::get_key()
 {
@@ -33,20 +42,11 @@ void CTERMINAL::get_key()
   {
     switch(input_key)
     {   
-    case Up: 
-      UP();
-      break;
-    case Down:
-      DOWN();
-      break;
-    case Enter:
-      ENTER();
-      break;
-    case Escape:
-      ESCAPE();
-      break;
+    case Up:    UP();     break;
+    case Down:  DOWN();   break;
+    case Enter: ENTER();  break;
+    case Escape:ESCAPE(); break;
     }
-    cur_key = input_key;
   }
 }
 
@@ -132,7 +132,7 @@ void CTERMINAL::DOWN()
     {
       selected++;
     }  
-    if (selected == 0)  // пересчёт окна и курсора
+    if (selected == 0)                  // пересчёт окна и курсора
     {
       indexTop = 0;
       cursorPos = 0;

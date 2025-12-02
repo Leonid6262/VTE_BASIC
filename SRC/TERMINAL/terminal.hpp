@@ -6,23 +6,15 @@
 #include <string>
 #include <vector>
 #include <stack>
-#include <cstdint>
-#include <iostream>
 
 class CTERMINAL{ 
   
 public:
   
-  struct SDependencies {
-    CSIFU& rSifu;
-  };
-  
   CTERMINAL(CTerminalUartDriver& drv);
-  
-  void initMenu(); 
-  
+
   // Типы переменных
-  enum VarType { NONE, USHORT, SHORT, FLOAT, BOOL };
+  enum VarType { NONE, USHORT, SSHORT, FLOAT, BOOL };
   
   struct MenuNode 
   {
@@ -49,9 +41,9 @@ private:
     unsigned char index;
   };  
   
-  std::vector<MenuNode> MENU;
-  std::vector<MenuNode>* currentList;
-  std::stack<Frame> history;
+  static std::vector<MenuNode> MENU;
+  static std::vector<MenuNode>* currentList;
+  static std::stack<Frame> history;
   
   void render_menu() const;
   void UP();
@@ -79,10 +71,8 @@ private:
     Escape = 0x1B,
   };
   
-  unsigned char cur_key;
-    
-  unsigned char selectedIndex;
-  unsigned char indexTop = 0;     // индекс верхней строки окна
-  unsigned char cursorPos = 0;    // 0 = верхняя строка, 1 = нижняя строка
+  static unsigned char selectedIndex;
+  static unsigned char indexTop;     // индекс верхней строки окна
+  static unsigned char cursorPos;    // 0 = верхняя строка, 1 = нижняя строка
 
 };

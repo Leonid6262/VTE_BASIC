@@ -28,29 +28,19 @@ private:
     signed short shift_adc[G_CONST::NUMBER_CHANNELS];   // 3 Смещения АЦП 
     float incline_adc[G_CONST::NUMBER_CHANNELS];        // 4 Наклон
     signed short shift_dac0;                            // 5 Смещение DAC0
-    struct Disp_c                                       // 6 Коэффициенты для отображения: p_NAME в % (дискрет/100%)
-    {                                                   //                                 c_NAME в единицах СИ
-      unsigned short p_i_rotor;
-      float          c_i_rotor;
-      unsigned short p_ustat_rms;
-      float          c_ustat_rms;
-      unsigned short p_istat_rms;
-      float          c_istat_rms;
-      unsigned short p_u_rotor;
-      float          c_u_rotor;
-      unsigned short p_i_leak;
-      float          c_i_leak;
-      unsigned short p_i_node;
-      float          c_i_node;
-      unsigned short p_e_set;
-      float          c_e_set;
-      unsigned short p_var8;
-      float          c_var8;
-      unsigned short p_var9;
-      float          c_var9;
-      unsigned short p_var10;
-      float          c_var10;
-    } disp_c;
+    struct Disp_Rem_Osc                                 // 6 Коэффициенты отображения Rem_Osc (дискрет/100%)
+    {                                                                                  
+      unsigned short i_rotor;
+      unsigned short ustat_rms;
+      unsigned short istat_rms;
+      unsigned short u_rotor;
+      unsigned short i_leak;
+      unsigned short i_node;
+      unsigned short e_set;
+      unsigned short var8;
+      unsigned short var9;
+      unsigned short var10;
+    } disp_rem_osc;
     unsigned char din_Pi_invert[G_CONST::BYTES_RW_MAX + 1];  // 7 Признак инвертирования дискретных входов (+1 - порт Pi0)
     unsigned char dout_spi_invert[G_CONST::BYTES_RW_MAX];    // 8 Признак инвертирования SPI выходов
     signed short  power_shift;                               // 9 Точный сдвиг силового напряжения
@@ -80,28 +70,18 @@ private:
       0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f
     },
     .shift_dac0 = 0,
-    .disp_c = 
+    .disp_rem_osc = 
     {
-      .p_i_rotor = 100,
-      .c_i_rotor = 0.5f,
-      .p_ustat_rms = 1380,
-      .c_ustat_rms = 13.8f,
-      .p_istat_rms = 1086,
-      .c_istat_rms = 0.5f,
-      .p_u_rotor = 100,
-      .c_u_rotor = 0.5f,  
-      .p_i_leak = 100,
-      .c_i_leak = 0.5f,
-      .p_i_node = 100,
-      .c_i_node = 0.5f,
-      .p_e_set = 100,
-      .c_e_set = 0.5f,
-      .p_var8 = 100,
-      .c_var8 = 0.5f,  
-      .p_var9 = 100,
-      .c_var9 = 0.5f,
-      .p_var10 = 100,
-      .c_var10 = 0.5f  
+      .i_rotor        = 100,
+      .ustat_rms      = 100,
+      .istat_rms      = 100,
+      .u_rotor        = 100,
+      .i_leak         = 100,
+      .i_node         = 100,
+      .e_set          = 100,
+      .var8           = 100,
+      .var9           = 100,
+      .var10          = 100,
     },
     .din_Pi_invert = {0,0,0,0},  
     .dout_spi_invert = { 0,0,0 },

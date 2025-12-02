@@ -158,7 +158,7 @@
                     <item>spi_ports</item>
                     <item>terminal</item>
                     <item>data_e_adc</item>
-                    <item></item>
+                    <item />
                 </expressions>
                 <col-names>
                     <item>Expression</item>

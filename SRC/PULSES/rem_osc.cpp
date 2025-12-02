@@ -25,7 +25,7 @@ CREM_OSC::CREM_OSC(CDMAcontroller& rContDMA,
   rPulsCalc(rP)
 {
   
-  // Пример структуры инициализирующих значений CREM_OSC. Дистанционный осцилограф (ESP32 c WiFi модулем)
+  // Структура инициализирующих значений CREM_OSC. Дистанционный осцилограф (ESP32 c WiFi модулем)
   
   auto& settings = CEEPSettings::getInstance().getSettings();
   CADC_STORAGE& instans = CADC_STORAGE::getInstance();
@@ -47,13 +47,13 @@ CREM_OSC::CREM_OSC(CDMAcontroller& rContDMA,
     },
     {
       // Уставки коэффициентов отображения (дискрет на 100%)
-      settings.disp_c.p_i_rotor, 
-      settings.disp_c.p_ustat_rms,
-      settings.disp_c.p_istat_rms,
-      settings.disp_c.p_u_rotor,
-      settings.disp_c.p_i_leak,
-      settings.disp_c.p_i_node,
-      settings.disp_c.p_e_set
+      settings.disp_rem_osc.i_rotor, 
+      settings.disp_rem_osc.ustat_rms,
+      settings.disp_rem_osc.istat_rms,
+      settings.disp_rem_osc.u_rotor,
+      settings.disp_rem_osc.i_leak,
+      settings.disp_rem_osc.i_node,
+      settings.disp_rem_osc.e_set
         // Количество треков определяется по ёмкости этого массива (d_100p) 
     },
     // Режим работы Access_point или Station
