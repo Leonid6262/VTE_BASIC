@@ -38,13 +38,6 @@ public:
   };
   
   void get_key();
-  
-  void render() const;
-  void up();
-  void down();
-  void enter();
-  void escape();
-  void edit(int delta);
  
 private:
   
@@ -59,6 +52,14 @@ private:
   std::vector<MenuNode> MENU;
   std::vector<MenuNode>* currentList;
   std::stack<Frame> history;
+  
+  void render_menu() const;
+  void UP();
+  void DOWN();
+  void ENTER();
+  void ESCAPE();
+  
+  static std::string padTo16(const std::string&);
   
   enum class ELED
   {

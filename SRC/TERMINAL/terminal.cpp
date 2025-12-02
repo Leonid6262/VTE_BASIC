@@ -1,16 +1,9 @@
 #include "terminal.hpp"
 #include "tree.hpp"
 
-unsigned short Irotor = 123;
-unsigned short Urotor = 456;
-unsigned short Istat = 789;
-float coeff = -123.64f;
-bool flag = true;
-
 CTERMINAL::CTERMINAL(CTerminalUartDriver& uartDrv) : uartDrv(uartDrv) 
 {
   initMenu();
-  render();
 }
 
 // Конструкторы узла
@@ -23,6 +16,14 @@ void CTERMINAL::initMenu()
   MENU = makeMENU();
   currentList = &MENU;
   selectedIndex = 0;
+  cursorPos = 0;
+  unsigned char clr_data[] = {"                \r\n"};
+  uartDrv.sendBuffer(clr_data, sizeof(clr_data));
+  uartDrv.sendBuffer(clr_data, sizeof(clr_data));
+  uartDrv.sendBuffer(clr_data, sizeof(clr_data));
+  unsigned char led_off[] = { static_cast<unsigned char>(ELED::LED_OFF), '\r' };
+  uartDrv.sendBuffer(led_off, sizeof(led_off));
+  render_menu();
 }  
 
 void CTERMINAL::get_key()
@@ -33,16 +34,16 @@ void CTERMINAL::get_key()
     switch(input_key)
     {   
     case Up: 
-      up();
+      UP();
       break;
     case Down:
-      down();
+      DOWN();
       break;
     case Enter:
-      enter();
+      ENTER();
       break;
     case Escape:
-      escape();
+      ESCAPE();
       break;
     }
     cur_key = input_key;
@@ -50,115 +51,134 @@ void CTERMINAL::get_key()
 }
 
 // Отображение двух строк
-void CTERMINAL::render() const 
+void CTERMINAL::render_menu() const 
 {
-  std::string string_line;
+  std::string string_line = "";
+  // Верхняя строка
+  const auto& node0 = (*currentList)[indexTop];
+  string_line = (cursorPos == 0 ? "-" : "");
+  string_line += node0.title;
+  string_line = padTo16(string_line);
+  string_line += "\r\n";
+  uartDrv.sendBuffer(reinterpret_cast<const unsigned char*>(string_line.c_str()), string_line.size());
   
-  for (int n_line = 0; n_line < 2; ++n_line) 
-  {
-    unsigned char idx = indexTop + n_line;
-    if (idx >= currentList->size()) break;
-    
-    const auto& node = (*currentList)[idx];
-    
-    // курсор
-    string_line += (cursorPos == n_line ? ">" : " ");
-    
-    string_line += node.title;
-    
-    if (node.value) 
-    {
-      string_line += " ";
-      switch (node.type) 
-      {
-      case USHORT: string_line += std::to_string(*(unsigned short*)node.value); break;
-      case SHORT:  
-        {
-          short v = *(short*)node.value;
-          string_line += (v >= 0 ? "+" : "") + std::to_string(v);
-        } 
-        break;
-      case FLOAT: 
-        {
-          float v = *(float*)node.value;
-          if (v >= 0) string_line += "+";
-          char buf[16];
-          snprintf(buf, sizeof(buf), "%.2f", v);
-          string_line += buf;
-        } 
-        break;
-      case BOOL: 
-        string_line += (*(bool*)node.value ? "true" : "false"); 
-        break;
-      default: break;
-      }
-      if (node.editable) string_line += " <";
-    }
-    string_line += "\r"; // только CR, без LF
+  // Нижняя строка (если есть)
+  if (indexTop + 1 < currentList->size()) {
+    const auto& node1 = (*currentList)[indexTop + 1];
+    string_line = (cursorPos == 1 ? "-" : "");
+    string_line += node1.title;
+    string_line = padTo16(string_line);
+    string_line += "\r";
+    uartDrv.sendBuffer(reinterpret_cast<const unsigned char*>(string_line.c_str()), string_line.size());
   } 
-  //uartDrv.sendBuffer((unsigned char*)string_line.c_str());//, out.size());
 }
 
-void CTERMINAL::up() 
+std::string CTERMINAL::padTo16(const std::string& s) 
 {
-  if (cursorPos == 1) 
+  if (s.size() >= 16) return s.substr(0, 16);   // если длиннее — обрезаем
+  return (s + std::string(16 - s.size(), ' ')); // дополняем пробелами
+}
+
+void CTERMINAL::UP() 
+{
+  if (currentList->empty()) return;     // защита от пустого списка
+  
+  unsigned char selected = indexTop + cursorPos;
+  
+  if (currentList->size() == 1)         // если всего один элемент — курсор всегда на нём
+  {       
+    indexTop = 0;
+    cursorPos = 0;
+  } else 
   {
-    cursorPos = 0; // просто перемещаем курсор на верхнюю строку
-  } else if (indexTop > 0) 
-  {
-    indexTop--;    // сдвигаем окно вверх
+    if (selected == 0)                  // циклический переход вверх
+    {
+      selected = currentList->size() - 1;
+    }
+    else
+    {
+      selected--;
+    }
+    if (selected == 0)                  // пересчёт окна и курсора
+    {
+      indexTop = 0;
+      cursorPos = 0;
+    } else 
+    {
+      indexTop = selected - 1;
+      cursorPos = 1;
+    }
+  } 
+  render_menu();
+}
+
+void CTERMINAL::DOWN() 
+{
+  if (currentList->empty()) return;     // защита от пустого списка
+  
+  unsigned char selected = indexTop + cursorPos;
+  
+  if (currentList->size() == 1)         // если всего один элемент — курсор всегда на нём
+  {   
+    indexTop = 0;
+    cursorPos = 0;
+  } else                                // циклический переход вниз
+  {   
+    if (selected + 1 >= currentList->size())
+    {
+      selected = 0;
+    }
+    else
+    {
+      selected++;
+    }  
+    if (selected == 0)  // пересчёт окна и курсора
+    {
+      indexTop = 0;
+      cursorPos = 0;
+    } else 
+    {
+      indexTop = selected - 1;
+      cursorPos = 1;
+    }
   }
-  render();
+  render_menu();
 }
 
-void CTERMINAL::down() 
+void CTERMINAL::ENTER() 
 {
-  if (cursorPos == 0) 
-  {
-    cursorPos = 1; // курсор на нижнюю строку
-  } else if (indexTop + 2 < currentList->size()) 
-  {
-    indexTop++;    // сдвигаем окно вниз
-  }
-  render();
-}
-
-void CTERMINAL::enter() 
-{
-  auto& node = (*currentList)[selectedIndex];
+  // Определяем текущий выбранный элемент по окну
+  unsigned char selected = indexTop + cursorPos;
+  auto& node = (*currentList)[selected];  
   if (!node.children.empty()) 
-  {
-    history.push({currentList, (uint8_t)selectedIndex});
-    currentList = &node.children;
-    selectedIndex = 0;
+  {   
+    history.push({currentList, selected});      // Сохраняем текущее состояние в стек истории  
+    currentList = &node.children;               // Переходим в дочерний список
+    indexTop = 0;                               // окно всегда с начала
+    cursorPos = 0;                              // курсор на верхней строке
   }
+  render_menu();
 }
 
-void CTERMINAL::escape() 
+void CTERMINAL::ESCAPE() 
 {
   if (!history.empty()) 
   {
     Frame f = history.top();
-    history.pop();
-    currentList = f.list;
-    selectedIndex = f.index;
-  }
-}
-
-// Редактирование значения
-void CTERMINAL::edit(int delta) 
-{
-  auto& node = (*currentList)[selectedIndex];
-  if (node.value && node.editable) 
-  {
-    switch (node.type) 
+    history.pop();        
+    currentList = f.list;               // Восстанавливаем список и выбранный индекс
+    unsigned char selected = f.index;       
+    if (selected == 0)                  // Восстанавливаем окно и курсор
     {
-    case USHORT: *(static_cast<unsigned short*>(node.value)) += delta; break;
-    case SHORT:  *(static_cast<short*>(node.value)) += delta; break;
-    case FLOAT:  *(static_cast<float*>(node.value)) += delta * 0.1f; break;
-    case BOOL:   *(static_cast<bool*>(node.value)) = !*(static_cast<bool*>(node.value)); break;
-    default: break;
+      indexTop = 0;
+      cursorPos = 0;
+    } else 
+    {
+      // Ставим выбранный элемент либо в верхнюю, либо в нижнюю строку окна
+      indexTop = (selected > 0 ? selected - 1 : 0);
+      cursorPos = (selected > 0 ? 1 : 0);
     }
   }
+  render_menu();
 }
 
