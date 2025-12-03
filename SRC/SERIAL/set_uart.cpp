@@ -57,11 +57,6 @@ CSET_UART::CSET_UART(EUartInstance UN)
   while (!(UART->LSR & THRE)){}; // Очистка передатчика
 }
 
-//LPC_UART_TypeDef* CSET_UART::getTypeDef() const
-//{
-//  return UART;
-//}
-
 
 
 

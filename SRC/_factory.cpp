@@ -30,7 +30,7 @@ CSPI_ports CFactory::createSPIports()
 
 CTERMINAL CFactory::createTERMINAL()
 {  
-  Pause_us(3000000);
+  Pause_us(4000000);
   CSET_UART uart(CSET_UART::EUartInstance::UART_0);                             // Конфигурация UART-0 - пультовый терминал
   CTerminalUartDriver& pUartDriver = CTerminalUartDriver::getInstance();
   pUartDriver.init(LPC_UART0, UART0_IRQn);                                      // Инициализация драйвера UART-0

@@ -6,8 +6,6 @@ CTERMINAL::CTERMINAL(CTerminalUartDriver& uartDrv) : uartDrv(uartDrv)
     // создание меню
     MENU = makeMENU();
     currentList = &MENU;
-    selectedIndex = 0;
-    cursorPos = 0;
 
     // очистка экрана
     unsigned char clr_data[] = {"                \r\n"};
@@ -57,19 +55,21 @@ void CTERMINAL::render_menu() const
   // Верхняя строка
   const auto& node0 = (*currentList)[indexTop];
   string_line = (cursorPos == 0 ? "-" : "");
-  string_line += node0.title;
-  string_line = padTo16(string_line);
-  string_line += "\r\n";
-  uartDrv.sendBuffer(reinterpret_cast<const unsigned char*>(string_line.c_str()), string_line.size());
+  string_line += node0.title; 
+  std::string cp1251 = utf8_to_cp1251(string_line);
+  cp1251 = padTo16(cp1251);    
+  cp1251 += "\r\n";      
+  uartDrv.sendBuffer(reinterpret_cast<const unsigned char*>(cp1251.c_str()), cp1251.size());
   
   // Нижняя строка (если есть)
   if (indexTop + 1 < currentList->size()) {
     const auto& node1 = (*currentList)[indexTop + 1];
     string_line = (cursorPos == 1 ? "-" : "");
     string_line += node1.title;
-    string_line = padTo16(string_line);
-    string_line += "\r";
-    uartDrv.sendBuffer(reinterpret_cast<const unsigned char*>(string_line.c_str()), string_line.size());
+    std::string cp1251 = utf8_to_cp1251(string_line);
+    cp1251 = padTo16(cp1251);    
+    cp1251 += "\r";    
+    uartDrv.sendBuffer(reinterpret_cast<const unsigned char*>(cp1251.c_str()), cp1251.size()); 
   } 
 }
 
@@ -181,4 +181,40 @@ void CTERMINAL::ESCAPE()
   }
   render_menu();
 }
+
+// UTF-8 в Windows-1251
+std::string CTERMINAL::utf8_to_cp1251(const std::string& utf8)
+{
+  std::string cp1251;
+  cp1251.reserve(utf8.size());
+  
+  for (size_t i = 0; i < utf8.size(); )
+  {
+    unsigned char c = (unsigned char)utf8[i];
+    if (c < 0x80) {
+      cp1251.push_back(c);
+      i++;
+    } else if ((c == 0xD0 || c == 0xD1) && i + 1 < utf8.size()) {
+      unsigned char c2 = (unsigned char)utf8[i+1];
+      unsigned char out;
+      if (c == 0xD0) {
+        if (c2 >= 0x90 && c2 <= 0xBF) out = c2 + 0x30;          // А..Я
+        else if (c2 == 0x81) out = 0xA8;                        // Ё
+        else out = '?';
+      } else {
+        if (c2 >= 0x80 && c2 <= 0x8F) out = c2 + 0x70;          // а..п
+        else if (c2 >= 0x90 && c2 <= 0x9F) out = c2 + 0x10;     // р..я
+        else if (c2 == 0x91) out = 0xB8;                        // ё
+        else out = '?';
+      }
+      cp1251.push_back(out);
+      i += 2;
+    } else {
+      cp1251.push_back('?');
+      i++;
+    }
+  }
+  return cp1251;
+}
+
 

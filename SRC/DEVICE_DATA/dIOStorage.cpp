@@ -14,7 +14,6 @@ CDIN_STORAGE::CDIN_STORAGE() : settings(CEEPSettings::getInstance())
 
 void CDIN_STORAGE::filter(unsigned char data_din_Pi, unsigned int dT, unsigned char n_port)
 {  
-  
   //¬ходные данные порта  с учЄтом инверсии
   unsigned char data_din_invert = data_din_Pi ^ CEEPSettings::getInstance().getSettings().din_Pi_invert[n_port];
   

@@ -30,7 +30,10 @@ public:
   };
   
   void get_key();
- 
+  
+  // Статическая утилита перекодировки
+  static std::string utf8_to_cp1251(const std::string& utf8);
+  
 private:
   
   CTerminalUartDriver& uartDrv;
@@ -74,5 +77,5 @@ private:
   static unsigned char selectedIndex;
   static unsigned char indexTop;     // индекс верхней строки окна
   static unsigned char cursorPos;    // 0 = верхняя строка, 1 = нижняя строка
-
+  
 };

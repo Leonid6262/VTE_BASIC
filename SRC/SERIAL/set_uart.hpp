@@ -13,8 +13,6 @@ public:
   
   CSET_UART(EUartInstance);
   
-  //LPC_UART_TypeDef* getTypeDef() const;
-  
 private: 
     // Настройки скорости
     struct SBaudRateSettings {
