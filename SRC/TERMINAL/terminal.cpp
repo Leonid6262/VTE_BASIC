@@ -31,71 +31,68 @@ CTERMINAL::MenuNode::MenuNode(const std::string& t,
 std::vector<CTERMINAL::MenuNode> CTERMINAL::MENU;
 std::vector<CTERMINAL::MenuNode>* CTERMINAL::currentList = nullptr;
 std::stack<CTERMINAL::Frame> CTERMINAL::history;
-unsigned char CTERMINAL::selectedIndex = 0; 
-unsigned char CTERMINAL::indexTop = 0;
-unsigned char CTERMINAL::cursorPos = 0; 
+unsigned char CTERMINAL::listIndex = 0; 
+unsigned char CTERMINAL::screenPosition = 0;
+unsigned char CTERMINAL::cursorLine = 0; 
 
 void CTERMINAL::get_key()
 {
   unsigned char input_key;
   if(uartDrv.poll_rx(input_key))
   {
-    switch(input_key)
-    {   
-    case Up:    UP();     break;
-    case Down:  DOWN();   break;
-    case Enter: ENTER();  break;
-    case Escape:ESCAPE(); break;
-    }
+    onKey((EKey_code)input_key);
   }
 }
 
 // Отображение двух строк меню
-void CTERMINAL::render_menu() const 
+void CTERMINAL::render_menu() const
 {
-  std::string string_line = "";
-  // Верхняя строка
-  const auto& node0 = (*currentList)[indexTop];
-  string_line = (cursorPos == 0 ? "-" : "");
-  string_line += node0.title; 
-  std::string cp1251 = utf8_to_cp1251(string_line);
-  cp1251 = padTo16(cp1251);    
-  cp1251 += "\r\n";      
-  uartDrv.sendBuffer(reinterpret_cast<const unsigned char*>(cp1251.c_str()), cp1251.size());
-  
-  // Нижняя строка (если есть)
-  if (indexTop + 1 < currentList->size()) {
-    const auto& node1 = (*currentList)[indexTop + 1];
-    string_line = (cursorPos == 1 ? "-" : "");
-    string_line += node1.title;
-    std::string cp1251 = utf8_to_cp1251(string_line);
-    cp1251 = padTo16(cp1251);    
-    cp1251 += "\r";    
-    uartDrv.sendBuffer(reinterpret_cast<const unsigned char*>(cp1251.c_str()), cp1251.size()); 
-  } 
+  // выводим два элемента списка начиная с screenPosition
+  for (int line = 0; line < 2; ++line) 
+  {
+    int listIndex = screenPosition + line;
+    std::string text;    
+    if (listIndex < currentList->size()) 
+    {
+      text = utf8_to_cp1251((*currentList)[listIndex].title);
+    } 
+    else 
+    {
+      text = "";
+    }    
+    // добавляем курсор, если это текущая строка
+    if (line == cursorLine) 
+    {
+      text = "-" + text;
+    }    
+    text = padTo16(text);
+    text += (line == 0 ? "\r\n" : "\r");
+    
+    uartDrv.sendBuffer(reinterpret_cast<const unsigned char*>(text.c_str()), text.size());
+  }
 }
 
 // Отображение окна переменной
 void CTERMINAL::render_var() const
 {
-    unsigned char selected = indexTop + cursorPos;
-    const auto& node = (*currentList)[selected];
-
-    // верхняя строка — имя переменной
-    std::string line1 = utf8_to_cp1251(node.title);
-    line1 = padTo16(line1);
-    line1 += "\r\n";
-    uartDrv.sendBuffer(reinterpret_cast<const unsigned char*>(line1.c_str()), line1.size());
-
-    // нижняя строка — значение
-    unsigned short val = *static_cast<unsigned short*>(node.value);
-    char buf[17];
-    snprintf(buf, sizeof(buf), "%5u", val);
-
-    std::string line2(buf);
-    line2 = padTo16(line2);
-    line2 += "\r";
-    uartDrv.sendBuffer(reinterpret_cast<const unsigned char*>(line2.c_str()), line2.size());
+  unsigned short listIndex = screenPosition + cursorLine;
+  const auto& node = (*currentList)[listIndex];
+  
+  // верхняя строка — имя переменной
+  std::string line1 = utf8_to_cp1251(node.title);
+  line1 = padTo16(line1);
+  line1 += "\r\n";
+  uartDrv.sendBuffer(reinterpret_cast<const unsigned char*>(line1.c_str()), line1.size());
+  
+  // нижняя строка — значение переменной
+  unsigned short val = *static_cast<unsigned short*>(node.value);
+  char buf[17];
+  snprintf(buf, sizeof(buf), "%5u", val);
+  
+  std::string line2(buf);
+  line2 = padTo16(line2);
+  line2 += "\r";
+  uartDrv.sendBuffer(reinterpret_cast<const unsigned char*>(line2.c_str()), line2.size());
 }
 
 std::string CTERMINAL::padTo16(const std::string& s) 
@@ -104,121 +101,78 @@ std::string CTERMINAL::padTo16(const std::string& s)
   return (s + std::string(16 - s.size(), ' ')); // дополняем пробелами
 }
 
-void CTERMINAL::UP() 
+void CTERMINAL::onKey(EKey_code key)
 {
-  if (currentList->empty()) return;     // защита от пустого списка
-  
-  unsigned char selected = indexTop + cursorPos;
-  
-  if (currentList->size() == 1)         // если всего один элемент — курсор всегда на нём
-  {       
-    indexTop = 0;
-    cursorPos = 0;
-  } else 
+  if (key == EKey_code::DOWN) 
   {
-    if (selected == 0)                  // циклический переход вверх
+    if (cursorLine == FirstLine && screenPosition + 1 < currentList->size()) 
     {
-      selected = currentList->size() - 1;
+      // курсор вниз, остаёмся в пределах экрана
+      cursorLine = SecondLine;
     }
-    else
+    else if (cursorLine == SecondLine && screenPosition + 2 < currentList->size()) 
     {
-      selected--;
-    }
-    if (selected == 0)                  // пересчёт окна и курсора
-    {
-      indexTop = 0;
-      cursorPos = 0;
-    } 
-    else 
-    {
-      indexTop = selected - 1;
-      cursorPos = 1;
-    }
-  } 
-  render_menu();
-}
-
-void CTERMINAL::DOWN() 
-{
-  if (currentList->empty()) return;     // защита от пустого списка
-  
-  unsigned char selected = indexTop + cursorPos;
-  
-  if (currentList->size() == 1)         // если всего один элемент — курсор всегда на нём
-  {   
-    indexTop = 0;
-    cursorPos = 0;
-  } else                                // циклический переход вниз
-  {   
-    if (selected + 1 >= currentList->size())
-    {
-      selected = 0;
-    }
-    else
-    {
-      selected++;
-    }  
-    if (selected == 0)                  // пересчёт окна и курсора
-    {
-      indexTop = 0;
-      cursorPos = 0;
-    } 
-    else 
-    {
-      indexTop = selected - 1;
-      cursorPos = 1;
+      // экран прокручивается вниз
+      screenPosition++;
     }
   }
-  render_menu();
-}
-
-void CTERMINAL::ENTER() 
-{
-    unsigned char selected = indexTop + cursorPos;
-    auto& node = (*currentList)[selected];
-
-    if (!node.children.empty()) {
-        history.push({currentList, selected});
-        currentList = &node.children;
-        indexTop = 0;
-        cursorPos = 0;
-
-        // если дочерние узлы содержат value → сразу режим переменных
-        if (currentList->size() > 0 && (*currentList)[0].value) {
-            render_var();
-        } else {
-            render_menu();
-        }
+  else if (key == EKey_code::UP) 
+  {
+    if (cursorLine == SecondLine) 
+    {
+      // курсор вверх, остаёмся в пределах экрана
+      cursorLine = FirstLine;
     }
-    else if (node.value) {
+    else if (cursorLine == FirstLine && screenPosition > 0) 
+    {
+      // экран прокручивается вверх
+      screenPosition--;
+    }
+  }
+  else if (key == EKey_code::ENTER) 
+  {
+    unsigned short listIndex = screenPosition + cursorLine;
+    auto& node = (*currentList)[listIndex];
+    
+    if (!node.children.empty()) 
+    {
+      // сохраняем всё состояние
+      history.push({currentList, screenPosition, cursorLine, listIndex});
+      
+      // переходим в подменю
+      currentList = &node.children;
+      screenPosition = 0;
+      cursorLine = FirstLine;
+      
+      if (!currentList->empty() && (*currentList)[0].value) 
+      {
         render_var();
-    }
-    else {
+      } 
+      else 
+      {
         render_menu();
+      }
     }
-}
-
-void CTERMINAL::ESCAPE() 
-{
-  if (!history.empty()) 
-  {
-    Frame f = history.top();
-    history.pop();        
-    currentList = f.list;               // Восстанавливаем список и выбранный индекс
-    unsigned char selected = f.index;       
-    if (selected == 0)                  // Восстанавливаем окно и курсор
+    else if (node.value) 
     {
-      indexTop = 0;
-      cursorPos = 0;
-    } 
-    else 
-    {
-      // Ставим выбранный элемент либо в верхнюю, либо в нижнюю строку окна
-      indexTop = (selected > 0 ? selected - 1 : 0);
-      cursorPos = (selected > 0 ? 1 : 0);
+      render_var();
     }
   }
-  render_menu();
+  else if (key == EKey_code::ESCAPE) 
+  {
+    if (!history.empty()) 
+    {
+      Frame f = history.top();
+      history.pop();
+      
+      currentList    = f.currentList;
+      screenPosition = f.screenPosition;
+      cursorLine     = f.cursorLine;
+      // listIndex можно использовать при необходимости напрямую
+      
+      render_menu();
+    }
+  }
 }
 
 // UTF-8 в Windows-1251

@@ -36,23 +36,16 @@ private:
   
   CTerminalUartDriver& uartDrv;
   
-  struct Frame 
-  {
-    std::vector<MenuNode>* list;
-    unsigned char index;
-  };  
+struct Frame {
+    std::vector<MenuNode>* currentList; // указатель на список
+    unsigned short screenPosition;      // позиция окна
+    unsigned short cursorLine;          // строка курсора (0 или 1)
+    unsigned short listIndex;           // фактический индекс выбранного узла
+};
   
   static std::vector<MenuNode> MENU;
   static std::vector<MenuNode>* currentList;
   static std::stack<Frame> history;
-  
-  void render_menu() const;
-  void render_var() const;
-  
-  void UP();
-  void DOWN();
-  void ENTER();
-  void ESCAPE();
   
   static std::string padTo16(const std::string&);
   
@@ -68,14 +61,27 @@ private:
   
   enum EKey_code
   {
-    Up     = 0x2B,
-    Down   = 0x2D,
-    Enter  = 0x0D,
-    Escape = 0x1B,
+    UP     = 0x2B,
+    DOWN   = 0x2D,
+    ENTER  = 0x0D,
+    ESCAPE = 0x1B,
   };
   
-  static unsigned char selectedIndex;
-  static unsigned char indexTop;     // индекс верхней строки окна
-  static unsigned char cursorPos;    // 0 = верхняя строка, 1 = нижняя строка
+  void onKey(EKey_code);
+  void render_menu() const;
+  void render_var() const;
+  
+  //void UP();
+  //void DOWN();
+  //void ENTER();
+  //void ESCAPE();
+  
+  
+  static unsigned char listIndex;       // текущий индекс
+  static unsigned char screenPosition;  // индекс первой строки окна
+  static unsigned char cursorLine;      // позиция курсора, первая строка / вторая строка
+  
+  static constexpr unsigned char FirstLine  = 0;
+  static constexpr unsigned char SecondLine = 1;
   
 };
