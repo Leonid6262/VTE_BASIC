@@ -16,18 +16,16 @@ public:
   // Типы переменных
   enum VarType { NONE, USHORT, SSHORT, FLOAT, BOOL };
   
-  struct MenuNode 
-  {
-    std::string title;              // название пункта
-    std::vector<MenuNode> children; // подменю
-    void* value = nullptr;          // указатель на переменную
-    VarType type = NONE;            // тип переменной
-    bool editable = false;          // признак редактируемости
-    
-    MenuNode(const std::string& t);
-    MenuNode(const std::string& t, void* v, VarType vt, bool edit = false);   
-    MenuNode(const std::string& t, std::vector<MenuNode> ch) : title(t), children(std::move(ch)) {} 
-  };
+struct MenuNode {
+    std::string title;
+    std::vector<MenuNode> children;
+    void* value;
+
+    // Универсальный конструктор
+    MenuNode(const std::string& t,
+             std::vector<MenuNode> c = {},
+             void* v = nullptr);
+};
   
   void get_key();
   
@@ -49,6 +47,8 @@ private:
   static std::stack<Frame> history;
   
   void render_menu() const;
+  void render_var() const;
+  
   void UP();
   void DOWN();
   void ENTER();

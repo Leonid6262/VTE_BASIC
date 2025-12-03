@@ -22,9 +22,11 @@ CTERMINAL::CTERMINAL(CTerminalUartDriver& uartDrv) : uartDrv(uartDrv)
 }
 
 // Конструкторы узла
-CTERMINAL::MenuNode::MenuNode(const std::string& t) : title(t) {}
-CTERMINAL::MenuNode::MenuNode(const std::string& t, void* v, VarType vt, bool edit) : title(t), value(v), type(vt), editable(edit) {}
-
+CTERMINAL::MenuNode::MenuNode(const std::string& t,
+                              std::vector<MenuNode> c,
+                              void* v)
+    : title(t), children(std::move(c)), value(v) {}
+    
 // Определения статических членов
 std::vector<CTERMINAL::MenuNode> CTERMINAL::MENU;
 std::vector<CTERMINAL::MenuNode>* CTERMINAL::currentList = nullptr;
@@ -48,7 +50,7 @@ void CTERMINAL::get_key()
   }
 }
 
-// Отображение двух строк
+// Отображение двух строк меню
 void CTERMINAL::render_menu() const 
 {
   std::string string_line = "";
@@ -71,6 +73,29 @@ void CTERMINAL::render_menu() const
     cp1251 += "\r";    
     uartDrv.sendBuffer(reinterpret_cast<const unsigned char*>(cp1251.c_str()), cp1251.size()); 
   } 
+}
+
+// Отображение окна переменной
+void CTERMINAL::render_var() const
+{
+    unsigned char selected = indexTop + cursorPos;
+    const auto& node = (*currentList)[selected];
+
+    // верхняя строка — имя переменной
+    std::string line1 = utf8_to_cp1251(node.title);
+    line1 = padTo16(line1);
+    line1 += "\r\n";
+    uartDrv.sendBuffer(reinterpret_cast<const unsigned char*>(line1.c_str()), line1.size());
+
+    // нижняя строка — значение
+    unsigned short val = *static_cast<unsigned short*>(node.value);
+    char buf[17];
+    snprintf(buf, sizeof(buf), "%5u", val);
+
+    std::string line2(buf);
+    line2 = padTo16(line2);
+    line2 += "\r";
+    uartDrv.sendBuffer(reinterpret_cast<const unsigned char*>(line2.c_str()), line2.size());
 }
 
 std::string CTERMINAL::padTo16(const std::string& s) 
@@ -103,7 +128,8 @@ void CTERMINAL::UP()
     {
       indexTop = 0;
       cursorPos = 0;
-    } else 
+    } 
+    else 
     {
       indexTop = selected - 1;
       cursorPos = 1;
@@ -136,7 +162,8 @@ void CTERMINAL::DOWN()
     {
       indexTop = 0;
       cursorPos = 0;
-    } else 
+    } 
+    else 
     {
       indexTop = selected - 1;
       cursorPos = 1;
@@ -147,17 +174,28 @@ void CTERMINAL::DOWN()
 
 void CTERMINAL::ENTER() 
 {
-  // Определяем текущий выбранный элемент по окну
-  unsigned char selected = indexTop + cursorPos;
-  auto& node = (*currentList)[selected];  
-  if (!node.children.empty()) 
-  {   
-    history.push({currentList, selected});      // Сохраняем текущее состояние в стек истории  
-    currentList = &node.children;               // Переходим в дочерний список
-    indexTop = 0;                               // окно всегда с начала
-    cursorPos = 0;                              // курсор на верхней строке
-  }
-  render_menu();
+    unsigned char selected = indexTop + cursorPos;
+    auto& node = (*currentList)[selected];
+
+    if (!node.children.empty()) {
+        history.push({currentList, selected});
+        currentList = &node.children;
+        indexTop = 0;
+        cursorPos = 0;
+
+        // если дочерние узлы содержат value → сразу режим переменных
+        if (currentList->size() > 0 && (*currentList)[0].value) {
+            render_var();
+        } else {
+            render_menu();
+        }
+    }
+    else if (node.value) {
+        render_var();
+    }
+    else {
+        render_menu();
+    }
 }
 
 void CTERMINAL::ESCAPE() 
@@ -172,7 +210,8 @@ void CTERMINAL::ESCAPE()
     {
       indexTop = 0;
       cursorPos = 0;
-    } else 
+    } 
+    else 
     {
       // Ставим выбранный элемент либо в верхнюю, либо в нижнюю строку окна
       indexTop = (selected > 0 ? selected - 1 : 0);
