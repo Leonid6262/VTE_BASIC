@@ -11,20 +11,20 @@ class CTERMINAL{
 public:
   
   CTERMINAL(CTerminalUartDriver& drv);
-
+  
   // Типы переменных
   enum class EVarType { NONE, USHORT, SSHORT, FLOAT, BOOL };
-  
-struct MenuNode {
+
+  struct MenuNode {
     std::string title;
     std::vector<MenuNode> children;
     void* value;
-
+    
     std::string unit;
     float scale;
     unsigned char precision;
     EVarType varType;
-
+    
     // Универсальный конструктор (только объявление!)
     MenuNode(const std::string& t,
              std::vector<MenuNode> c = {},
@@ -33,8 +33,8 @@ struct MenuNode {
              float s = 1.0f,
              unsigned char p = 0,
              EVarType vt = EVarType::NONE);
-             
-};
+    
+  };
   
   void get_key();
   
