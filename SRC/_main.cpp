@@ -26,7 +26,7 @@ void main(void)
   CFactory::start_puls_system(cont_dma);                // Запуск СИФУ и всех её зависимостей. (см. CFactory)
  
   CDIN_STORAGE::UserLedOff();                           // Визуальный контроль окончания инициализации
-   
+ 
   while(true)
   {                
     i_adc.measure_5V();         // Измерение напряжения питания +/- 5V (внутреннее ADC)        

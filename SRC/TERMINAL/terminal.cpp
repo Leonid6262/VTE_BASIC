@@ -1,4 +1,5 @@
 #include "terminal.hpp"
+#include "pause_us.hpp"
 #include "tree.hpp"
 
 CTERMINAL::CTERMINAL(CTerminalUartDriver& uartDrv) : uartDrv(uartDrv) 
@@ -17,16 +18,31 @@ CTERMINAL::CTERMINAL(CTerminalUartDriver& uartDrv) : uartDrv(uartDrv)
     unsigned char led_off[] = { static_cast<unsigned char>(ELED::LED_OFF), '\r' };
     uartDrv.sendBuffer(led_off, sizeof(led_off));
 
+    
+    mode = EViewMode::Menu;   // текущий режим - Меню
+    
     // первая отрисовка меню
     render_menu();
 }
 
-// Конструкторы узла
+// Конструктор узла
 CTERMINAL::MenuNode::MenuNode(const std::string& t,
                               std::vector<MenuNode> c,
-                              void* v)
-    : title(t), children(std::move(c)), value(v) {}
-    
+                              void* v,
+                              const std::string& u,
+                              float s,
+                              unsigned char p,
+                              EVarType vt)
+    : title(t),
+      children(std::move(c)),
+      value(v),
+      unit(u),
+      scale(s),
+      precision(p),
+      varType(vt) 
+{}
+
+  
 // Определения статических членов
 std::vector<CTERMINAL::MenuNode> CTERMINAL::MENU;
 std::vector<CTERMINAL::MenuNode>* CTERMINAL::currentList = nullptr;
@@ -40,7 +56,11 @@ void CTERMINAL::get_key()
   unsigned char input_key;
   if(uartDrv.poll_rx(input_key))
   {
-    onKey((EKey_code)input_key);
+    onKey(static_cast<EKey_code>(input_key));
+  }
+  else 
+  {
+    onKey(EKey_code::NONE); // нет нажатий
   }
 }
 
@@ -72,26 +92,69 @@ void CTERMINAL::render_menu() const
   }
 }
 
+static std::string padRight(const std::string& s, unsigned char width)
+{
+  if (s.size() >= width) return s.substr(0, width);
+  std::string out = s;
+  out.append(width - out.size(), ' ');
+  return out;
+}
+
 // Отображение окна переменной
-void CTERMINAL::render_var() const
+void CTERMINAL::render_var(EEntry entry) const
 {
   unsigned short listIndex = screenPosition + cursorLine;
   const auto& node = (*currentList)[listIndex];
-  
-  // верхняя строка — имя переменной
-  std::string line1 = utf8_to_cp1251(node.title);
-  line1 = padTo16(line1);
-  line1 += "\r\n";
-  uartDrv.sendBuffer(reinterpret_cast<const unsigned char*>(line1.c_str()), line1.size());
-  
+  if(entry == CTERMINAL::EEntry::First)
+  {
+    // верхняя строка — имя переменной
+    std::string title_cp1251 = utf8_to_cp1251(node.title);  // UTF-8 -> CP1251
+    std::string line1 = padRight(title_cp1251, (16 - node.unit.size())) + node.unit + "\r\n";  
+    uartDrv.sendBuffer(reinterpret_cast<const unsigned char*>(line1.c_str()), line1.size());    
+  }
+
   // нижняя строка — значение переменной
-  unsigned short val = *static_cast<unsigned short*>(node.value);
   char buf[17];
-  snprintf(buf, sizeof(buf), "%5u", val);
+  switch (node.varType)
+  {
+  case EVarType::SSHORT:
+    {
+      signed short raw = *static_cast<signed short*>(node.value);
+      float val = raw * node.scale;
+      snprintf(buf, sizeof(buf), "%.*f", node.precision, val);
+      break;
+    }
+    
+  case EVarType::USHORT:
+    {
+      unsigned short raw = *static_cast<unsigned short*>(node.value);
+      float val = raw * node.scale;
+      snprintf(buf, sizeof(buf), "%.*f", node.precision, val);
+      break;
+    }
+    
+  case EVarType::FLOAT:
+    {
+      float raw = *static_cast<float*>(node.value);
+      float val = raw * node.scale;
+      snprintf(buf, sizeof(buf), "%.*f", node.precision, val);
+      break;
+    }
+    
+  case EVarType::BOOL:
+    {
+      bool raw = *static_cast<bool*>(node.value);
+      snprintf(buf, sizeof(buf), "%s", raw ? "ON" : "OFF");
+      break;
+    }
+    
+  default:
+    snprintf(buf, sizeof(buf), "----");
+    break;
+  }
   
   std::string line2(buf);
-  line2 = padTo16(line2);
-  line2 += "\r";
+  line2 = padTo16(line2) + "\r";
   uartDrv.sendBuffer(reinterpret_cast<const unsigned char*>(line2.c_str()), line2.size());
 }
 
@@ -103,75 +166,157 @@ std::string CTERMINAL::padTo16(const std::string& s)
 
 void CTERMINAL::onKey(EKey_code key)
 {
-  if (key == EKey_code::DOWN) 
+  switch (key)
   {
-    if (cursorLine == FirstLine && screenPosition + 1 < currentList->size()) 
-    {
-      // курсор вниз, остаёмся в пределах экрана
-      cursorLine = SecondLine;
+  case EKey_code::DOWN:
+    if (mode == EViewMode::Variable) navigateDownVar();
+    else navigateDownMenu();
+    break;
+    
+  case EKey_code::UP:
+    if (mode == EViewMode::Variable) navigateUpVar();
+    else navigateUpMenu();
+    break;
+    
+  case EKey_code::ENTER:
+    handleEnter();
+    break;
+    
+  case EKey_code::ESCAPE:
+    handleEscape();
+    break;
+    
+  case EKey_code::FnENTER:  // Fn+Enter - Запись уставок
+    {unsigned char led_green[] = { static_cast<unsigned char>(ELED::LED_GREEN), '\r' };
+    uartDrv.sendBuffer(led_green, sizeof(led_green));
+    CEEPSettings::getInstance().saveSettings();
+    Pause_us(200000);
+    unsigned char led_off[] = { static_cast<unsigned char>(ELED::LED_OFF), '\r' };
+    uartDrv.sendBuffer(led_off, sizeof(led_off));}
+    break;   
+    
+  case EKey_code::NONE:  
+  default:
+    // таймер для периодического обновления индикации
+    static unsigned int prev_TC0 = LPC_TIM0->TC;
+    unsigned int dTrs = LPC_TIM0->TC - prev_TC0; // дельта [0.1 мкс]
+    
+    if (mode == EViewMode::Variable && dTrs >= 2000000) { // 200 мс
+      prev_TC0 = LPC_TIM0->TC;
+      render_var(CTERMINAL::EEntry::Next);
     }
-    else if (cursorLine == SecondLine && screenPosition + 2 < currentList->size()) 
-    {
-      // экран прокручивается вниз
+    break;
+  }
+}
+
+// Навигация вниз по меню
+void CTERMINAL::navigateDownMenu() {
+  unsigned short listIndex = screenPosition + cursorLine;
+  if (listIndex + 1 < currentList->size()) {
+    if (cursorLine == FirstLine) {
+      cursorLine = SecondLine;
+    } else {
       screenPosition++;
     }
+  } else {
+    // циклический переход: с последнего на первый
+    screenPosition = 0;
+    cursorLine = FirstLine;
   }
-  else if (key == EKey_code::UP) 
-  {
-    if (cursorLine == SecondLine) 
-    {
-      // курсор вверх, остаёмся в пределах экрана
+  render_menu();
+}
+// Навигация вверх по меню
+void CTERMINAL::navigateUpMenu() {
+  unsigned short listIndex = screenPosition + cursorLine;
+  if (listIndex > 0) {
+    if (cursorLine == SecondLine) {
       cursorLine = FirstLine;
-    }
-    else if (cursorLine == FirstLine && screenPosition > 0) 
-    {
-      // экран прокручивается вверх
+    } else {
       screenPosition--;
     }
-  }
-  else if (key == EKey_code::ENTER) 
-  {
-    unsigned short listIndex = screenPosition + cursorLine;
-    auto& node = (*currentList)[listIndex];
-    
-    if (!node.children.empty()) 
-    {
-      // сохраняем всё состояние
-      history.push({currentList, screenPosition, cursorLine, listIndex});
-      
-      // переходим в подменю
-      currentList = &node.children;
+  } else {
+    // циклический переход: с первого на последний
+    if (currentList->size() > 1) {
+      screenPosition = currentList->size() - 2;
+      cursorLine = SecondLine;
+    } else {
       screenPosition = 0;
       cursorLine = FirstLine;
-      
-      if (!currentList->empty() && (*currentList)[0].value) 
-      {
-        render_var();
-      } 
-      else 
-      {
-        render_menu();
-      }
-    }
-    else if (node.value) 
-    {
-      render_var();
     }
   }
-  else if (key == EKey_code::ESCAPE) 
-  {
-    if (!history.empty()) 
-    {
-      Frame f = history.top();
-      history.pop();
-      
-      currentList    = f.currentList;
-      screenPosition = f.screenPosition;
-      cursorLine     = f.cursorLine;
-      // listIndex можно использовать при необходимости напрямую
-      
+  render_menu();
+}
+// Навигация вниз по переменным
+void CTERMINAL::navigateDownVar() {
+  unsigned short listIndex = screenPosition + cursorLine;
+  if (listIndex + 1 < currentList->size()) {
+    if (cursorLine == FirstLine) {
+      cursorLine = SecondLine;
+    } else {
+      screenPosition++;
+    }
+  } else {
+    screenPosition = 0;
+    cursorLine = FirstLine;
+  }
+  render_var(CTERMINAL::EEntry::First);
+}
+// Навигация вверх по переменным
+void CTERMINAL::navigateUpVar() {
+  unsigned short listIndex = screenPosition + cursorLine;
+  if (listIndex > 0) {
+    if (cursorLine == SecondLine) {
+      cursorLine = FirstLine;
+    } else {
+      screenPosition--;
+    }
+  } else {
+    if (currentList->size() > 1) {
+      screenPosition = currentList->size() - 2;
+      cursorLine = SecondLine;
+    } else {
+      screenPosition = 0;
+      cursorLine = FirstLine;
+    }
+  }
+  render_var(CTERMINAL::EEntry::First);
+}
+// Обработка ENTER
+void CTERMINAL::handleEnter() {
+  unsigned short listIndex = screenPosition + cursorLine;
+  auto& node = (*currentList)[listIndex];
+  
+  if (!node.children.empty()) {
+    history.push({currentList, screenPosition, cursorLine, listIndex});
+    currentList    = &node.children;
+    screenPosition = 0;
+    cursorLine     = FirstLine;
+    
+    if (!currentList->empty() && (*currentList)[0].value) {
+      mode = EViewMode::Variable;
+      render_var(CTERMINAL::EEntry::First);
+    } else {
+      mode = EViewMode::Menu;
       render_menu();
     }
+  }
+  else if (node.value) {
+    mode = EViewMode::Variable;
+    render_var(CTERMINAL::EEntry::First);
+  }
+}
+// Обработка ESCAPE
+void CTERMINAL::handleEscape() {
+  if (!history.empty()) {
+    Frame f = history.top();
+    history.pop();
+    
+    currentList    = f.currentList;
+    screenPosition = f.screenPosition;
+    cursorLine     = f.cursorLine;
+    
+    mode = EViewMode::Menu;
+    render_menu();
   }
 }
 

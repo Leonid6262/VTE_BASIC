@@ -1,7 +1,6 @@
 #pragma once
 
 #include "terminalUartDriver.hpp"
-#include "SIFU.hpp"
 
 #include <string>
 #include <vector>
@@ -14,17 +13,27 @@ public:
   CTERMINAL(CTerminalUartDriver& drv);
 
   // Типы переменных
-  enum VarType { NONE, USHORT, SSHORT, FLOAT, BOOL };
+  enum class EVarType { NONE, USHORT, SSHORT, FLOAT, BOOL };
   
 struct MenuNode {
     std::string title;
     std::vector<MenuNode> children;
     void* value;
 
-    // Универсальный конструктор
+    std::string unit;
+    float scale;
+    unsigned char precision;
+    EVarType varType;
+
+    // Универсальный конструктор (только объявление!)
     MenuNode(const std::string& t,
              std::vector<MenuNode> c = {},
-             void* v = nullptr);
+             void* v = nullptr,
+             const std::string& u = "",
+             float s = 1.0f,
+             unsigned char p = 0,
+             EVarType vt = EVarType::NONE);
+             
 };
   
   void get_key();
@@ -59,27 +68,44 @@ struct Frame {
     LED_OFF    = 0x0B 
   };
   
-  enum EKey_code
+  enum class EKey_code
   {
-    UP     = 0x2B,
-    DOWN   = 0x2D,
-    ENTER  = 0x0D,
-    ESCAPE = 0x1B,
+    NONE    = 0x00,
+    UP      = 0x2B,
+    DOWN    = 0x2D,
+    ENTER   = 0x0D,
+    ESCAPE  = 0x1B,
+    FnENTER = 0x78
   };
+  
+  enum class EEntry {
+    First,
+    Next
+  };
+  
+  enum class EViewMode {
+    Menu,
+    Variable
+  };
+  
+  EViewMode mode;
+  
+  void navigateDownVar();
+  void navigateDownMenu();
+  void navigateUpVar();
+  void navigateUpMenu();
+  void handleEnter();
+  void handleEscape();
   
   void onKey(EKey_code);
   void render_menu() const;
-  void render_var() const;
-  
-  //void UP();
-  //void DOWN();
-  //void ENTER();
-  //void ESCAPE();
-  
+  void render_var(EEntry) const;
   
   static unsigned char listIndex;       // текущий индекс
   static unsigned char screenPosition;  // индекс первой строки окна
   static unsigned char cursorLine;      // позиция курсора, первая строка / вторая строка
+  
+  static bool dataViewMode;
   
   static constexpr unsigned char FirstLine  = 0;
   static constexpr unsigned char SecondLine = 1;
