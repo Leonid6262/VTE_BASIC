@@ -40,8 +40,8 @@ private:
   
   unsigned char N_Pulse;
   
-  signed short A_Task_tick;  
-  signed short A_Cur_tick; 
+  signed short Alpha_setpoint;  
+  signed short Alpha_current; 
   
   void control_sync();
   signed int timing_calc();
@@ -79,9 +79,9 @@ private:
     static constexpr signed short Max_power_shift   =  _90gr;
     static constexpr signed short Min_power_shift   = -_90gr;
     
-    static constexpr signed short A_Max_tick   = _150gr;
-    static constexpr signed short A_Min_tick   = _30gr;
-    static constexpr signed short d_A_Max_tick = _5gr;
+    static constexpr signed short Alpha_Max   = _150gr;
+    static constexpr signed short Alpha_Min   = _30gr;
+    static constexpr signed short dAlpha      = _5gr;
     
     static constexpr unsigned int N_PULSES     = 6;
     

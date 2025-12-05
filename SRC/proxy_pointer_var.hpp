@@ -1,6 +1,6 @@
 #pragma once
 
-// Prox-Singleton концентратор переменных
+// Prox-Singleton списка указателей
 
 class CProxyPointerVar 
 {
@@ -24,7 +24,7 @@ public:
   const float u_rotor_disp      = 0.7f;
   const float i_stator_rms_disp = 0.8f;
   const float u_stator_rms_disp = 0.1f;
-  const float alpha_disp        = 0.018f; // 180гр/10000
+  const float alpha_disp        = 180.0f/10000.0f; // 180гр/10000мкс
   
   // Доступ к указателям
   signed short* getIrotor()     const { return pI_rotor; }
@@ -36,12 +36,16 @@ public:
   
 private:
   
-  CProxyPointerVar() = default;
-  
+  // Список указателей
   signed short* pI_rotor;
   signed short* pU_rotor;
   signed short* pI_statorRms;
   signed short* pU_statorRms;
   
   signed short* pAlphaCur;
+  
+    
+  CProxyPointerVar() = default;
+  CProxyPointerVar(const CProxyPointerVar&) = delete;
+  CProxyPointerVar& operator=(const CProxyPointerVar&) = delete;
 };

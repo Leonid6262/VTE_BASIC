@@ -55,14 +55,14 @@ void CSIFU::rising_puls()
     break;  
   case EOperating_mode::RESYNC:           
     {Operating_mode = EOperating_mode::NORMAL;           // Синхронизация с 1-го в Alpha_max
-    A_Task_tick = s_const.A_Max_tick;
-    A_Cur_tick = s_const.A_Max_tick; 
+    Alpha_setpoint = s_const.Alpha_Max;
+    Alpha_current = s_const.Alpha_Max; 
     // 1-2-3-4-sync-5->6-1-2-3-4-sync-5->6-1-2....
     // Здесь и далее, кастования слагаемых приведены для наглядности,
     // без магии циклической арифметики таймера по модулю 2^32
     signed int res = 
                static_cast<signed int>(v_sync.CURRENT_SYNC)
-             + static_cast<signed int>(A_Cur_tick)
+             + static_cast<signed int>(Alpha_current)
              + static_cast<signed int>(v_sync.cur_power_shift);
     LPC_TIM3->MR0 = static_cast<unsigned int>(res);    
     N_Pulse = 6;}    
@@ -71,13 +71,13 @@ void CSIFU::rising_puls()
     // Ограничения величины сдвига
     v_sync.task_power_shift = limits_val(&v_sync.task_power_shift, s_const.Min_power_shift, s_const.Max_power_shift);    
     // Ограничения приращения сдвига
-    limits_dval(&v_sync.task_power_shift, &v_sync.cur_power_shift, s_const.d_A_Max_tick);
-    A_Task_tick = s_const._0gr;
+    limits_dval(&v_sync.task_power_shift, &v_sync.cur_power_shift, s_const.dAlpha);
+    Alpha_setpoint = s_const._0gr;
     LPC_TIM3->MR0 = timing_calc();      // Задание тайминга для следующего импульса
     break;
   case EOperating_mode::NORMAL:   
     // Ограничения величины альфа 
-    A_Task_tick = limits_val(&A_Task_tick, s_const.A_Min_tick, s_const.A_Max_tick); 
+    Alpha_setpoint = limits_val(&Alpha_setpoint, s_const.Alpha_Min, s_const.Alpha_Max); 
     LPC_TIM3->MR0 = timing_calc();      // Задание тайминга для следующего импульса 
     break;
   } 
@@ -97,14 +97,14 @@ void CSIFU::rising_puls()
 signed int CSIFU::timing_calc()
 {  
   // Ограничения приращения альфа
-  signed short d_Alpha = limits_dval(&A_Task_tick, &A_Cur_tick, s_const.d_A_Max_tick);
+  signed short d_Alpha = limits_dval(&Alpha_setpoint, &Alpha_current, s_const.dAlpha);
   if(v_sync.SYNC_EVENT)
   {
     // Коррекция по синхронизации
     v_sync.SYNC_EVENT = false;
     signed int ret = 
                static_cast<signed int>(v_sync.CURRENT_SYNC)
-             + static_cast<signed int>(A_Cur_tick)
+             + static_cast<signed int>(Alpha_current)
              + static_cast<signed int>(offsets[N_Pulse])
              + static_cast<signed int>(v_sync.cur_power_shift);
     return static_cast<unsigned int>(ret);
@@ -215,11 +215,11 @@ void CSIFU::control_sync()
 }  
 void CSIFU::set_alpha(signed short alpha)
 {
-  A_Task_tick = alpha;
+  Alpha_setpoint = alpha;
 }
 signed short* CSIFU::getPointerAlpha()
 {
-  return &A_Cur_tick;
+  return &Alpha_current;
 }
 void  CSIFU::set_forcing_bridge()
 {
@@ -246,7 +246,7 @@ void  CSIFU::stop_phasing_mode()
 {
   CEEPSettings::getInstance().getSettings().power_shift = v_sync.cur_power_shift;
   CEEPSettings::getInstance().getSettings().d_power_shift = v_sync.d_power_shift;
-  A_Task_tick = s_const.A_Max_tick;
+  Alpha_setpoint = s_const.Alpha_Max;
   Operating_mode = EOperating_mode::NORMAL;
 }
 void CSIFU::set_a_shift(signed short shift)
@@ -281,6 +281,8 @@ void CSIFU::init_and_start()
   v_sync.SYNC_EVENT = false;  
   v_sync.no_sync_pulses = 0;
   v_sync.sync_pulses = 0;
+  Alpha_setpoint = s_const.Alpha_Max;
+  Alpha_current = s_const.Alpha_Max; 
   Operating_mode = EOperating_mode::NO_SYNC;
   
   LPC_SC->PCONP   |= CLKPWR_PCONP_PCPWM0;       //PWM0 power/clock control bit.

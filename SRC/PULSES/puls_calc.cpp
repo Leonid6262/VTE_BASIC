@@ -6,7 +6,7 @@ CPULSCALC::CPULSCALC(CADC& rAdc) : rAdc(rAdc)
 {
   v_restoration.ind_d_avr = 0;
   
-  // Регистрация указателей в прокси фабрики меню
+  // Регистрация в списке указателей
   CProxyPointerVar::getInstance().registerIstatorRms(&U_STATORA);
   CProxyPointerVar::getInstance().registerUstatorRms(&I_STATORA);
 }
