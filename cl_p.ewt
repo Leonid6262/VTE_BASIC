@@ -2925,13 +2925,13 @@
         <group>
             <name>TERMINAL</name>
             <file>
+                <name>$PROJ_DIR$\SRC\TERMINAL\menu_factory.hpp</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\SRC\TERMINAL\terminal.cpp</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\SRC\TERMINAL\terminalUartDriver.cpp</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\SRC\TERMINAL\tree.hpp</name>
             </file>
         </group>
         <file>
@@ -2951,6 +2951,9 @@
         </file>
         <file>
             <name>$PROJ_DIR$\SRC\IntPriority.hpp</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\SRC\proxy_pointer_var.hpp</name>
         </file>
         <file>
             <name>$PROJ_DIR$\SRC\rtc.cpp</name>

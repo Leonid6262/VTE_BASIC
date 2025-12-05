@@ -11,6 +11,7 @@ class CTERMINAL{
 public:
   
   CTERMINAL(CTerminalUartDriver& drv);
+  void make_menu();
   
   // Типы переменных
   enum class EVarType { NONE, USHORT, SSHORT, FLOAT, BOOL };
@@ -89,7 +90,7 @@ struct Frame {
   };
   
   EViewMode mode;
-  
+ 
   void navigateDownVar();
   void navigateDownMenu();
   void navigateUpVar();

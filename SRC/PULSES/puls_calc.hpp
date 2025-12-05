@@ -12,10 +12,19 @@ public:
   CADC& rAdc;
   void conv_and_calc();
   
-  signed short U_STATORA;  
-  signed short I_STATORA;
+  inline signed short* getPointer_USTATORA()
+  {
+    return &U_STATORA;
+  }
+  inline signed short* getPointer_ISTATORA()
+  {
+    return &I_STATORA;
+  }
   
 private:
+  
+  signed short U_STATORA;  
+  signed short I_STATORA;
   
   struct RestorationState 
   {

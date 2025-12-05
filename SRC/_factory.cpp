@@ -52,10 +52,10 @@ void CFactory::start_puls_system(CDMAcontroller& rCont_dma)
                           CDMAcontroller::EConnNumber::SSP2_Rx,                 //Номер подключения Rx
                           CDMAcontroller::EConnNumber::SSP2_Tx,                 //Номер подключения Tx
                           puls_calc                                             //Измерение и обработка
-                            );              
-  
-  CProxyHandlerTIMER::getInstance().set_pointers(&sifu, &rem_osc);      // Proxy Singleton доступа к Handler TIMER. 
-  sifu.init_and_start();                                                // Старт SIFU
+                            );
+  CProxyPointerVar::getInstance().registerAlphaCur(sifu.getPointerAlpha());// Регистрация указателя в прокси фабрики меню
+  CProxyHandlerTIMER::getInstance().set_pointers(&sifu, &rem_osc);       // Proxy Singleton доступа к Handler TIMER. 
+  sifu.init_and_start();                                                 // Старт SIFU
 }
 
 

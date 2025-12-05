@@ -12,7 +12,7 @@
         <ByteLimit>50</ByteLimit>
     </Stack>
     <DebugChecksum>
-        <Checksum>3278302583</Checksum>
+        <Checksum>861945275</Checksum>
     </DebugChecksum>
     <CodeCoverage>
         <Enabled>_ 0</Enabled>
@@ -162,16 +162,17 @@
         <Fmt2>LPC_CAN_TypeDef-ICR	1	0</Fmt2>
         <Fmt3>LPC_CAN_TypeDef-MOD	1	0</Fmt3>
         <Fmt4>LPC_CAN_TypeDef-SR	1	0</Fmt4>
-        <Fmt5>struct CEEPSettings::WorkSettings-power_shift	3	0</Fmt5>
-        <Fmt6>struct CRTC::SDateTime-day	3	0</Fmt6>
-        <Fmt7>struct CRTC::SDateTime-hour	3	0</Fmt7>
-        <Fmt8>struct CRTC::SDateTime-minute	3	0</Fmt8>
-        <Fmt9>struct CRTC::SDateTime-month	3	0</Fmt9>
-        <Fmt10>struct CRTC::SDateTime-second	3	0</Fmt10>
-        <Fmt11>struct CRTC::SDateTime-year	3	0</Fmt11>
-        <Fmt12>struct CSIFU::SyncState-cur_power_shift	3	0</Fmt12>
-        <Fmt13>struct CSIFU::SyncState-d_power_shift	3	0</Fmt13>
-        <Fmt14>struct CSIFU::SyncState-task_power_shift	3	0</Fmt14>
+        <Fmt5>class CSIFU-A_Cur_tick	3	0</Fmt5>
+        <Fmt6>struct CEEPSettings::WorkSettings-power_shift	3	0</Fmt6>
+        <Fmt7>struct CRTC::SDateTime-day	3	0</Fmt7>
+        <Fmt8>struct CRTC::SDateTime-hour	3	0</Fmt8>
+        <Fmt9>struct CRTC::SDateTime-minute	3	0</Fmt9>
+        <Fmt10>struct CRTC::SDateTime-month	3	0</Fmt10>
+        <Fmt11>struct CRTC::SDateTime-second	3	0</Fmt11>
+        <Fmt12>struct CRTC::SDateTime-year	3	0</Fmt12>
+        <Fmt13>struct CSIFU::SyncState-cur_power_shift	3	0</Fmt13>
+        <Fmt14>struct CSIFU::SyncState-d_power_shift	3	0</Fmt14>
+        <Fmt15>struct CSIFU::SyncState-task_power_shift	3	0</Fmt15>
     </struct_types>
     <array_types>
         <Fmt0>byte[8]	3	0</Fmt0>

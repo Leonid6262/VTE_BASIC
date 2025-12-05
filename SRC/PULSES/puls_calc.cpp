@@ -1,9 +1,14 @@
 #include "puls_calc.hpp"
 #include "AdcStorage.hpp"
+#include "proxy_pointer_var.hpp"
 
 CPULSCALC::CPULSCALC(CADC& rAdc) : rAdc(rAdc) 
 {
   v_restoration.ind_d_avr = 0;
+  
+  // Регистрация указателей в прокси фабрики меню
+  CProxyPointerVar::getInstance().registerIstatorRms(&U_STATORA);
+  CProxyPointerVar::getInstance().registerUstatorRms(&I_STATORA);
 }
 
 void CPULSCALC::conv_and_calc()
@@ -97,5 +102,5 @@ void CPULSCALC::sin_restoration()
                 v_restoration.i_stat[5]
                          ) / v_restoration.PULS_AVR;
   I_STATORA = static_cast<int>(iavr + 0.5f);
-  
 }
+

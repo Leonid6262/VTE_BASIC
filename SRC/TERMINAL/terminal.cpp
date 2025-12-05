@@ -1,13 +1,10 @@
 #include "terminal.hpp"
 #include "pause_us.hpp"
-#include "tree.hpp"
+#include "settings_eep.hpp"
+#include "menu_factory.hpp"
 
 CTERMINAL::CTERMINAL(CTerminalUartDriver& uartDrv) : uartDrv(uartDrv) 
 {
-    // создание меню
-    MENU = makeMENU();
-    currentList = &MENU;
-
     // очистка экрана
     unsigned char clr_data[] = {"                \r\n"};
     uartDrv.sendBuffer(clr_data, sizeof(clr_data));
@@ -17,14 +14,16 @@ CTERMINAL::CTERMINAL(CTerminalUartDriver& uartDrv) : uartDrv(uartDrv)
     // выключение светодиода
     unsigned char led_off[] = { static_cast<unsigned char>(ELED::LED_OFF), '\r' };
     uartDrv.sendBuffer(led_off, sizeof(led_off));
-
-    
-    mode = EViewMode::Menu;   // текущий режим - Меню
-    
-    // первая отрисовка меню
-    render_menu();
 }
 
+void CTERMINAL::make_menu()
+{
+  // создание меню
+  MENU = MENU_Factory(); 
+  currentList = &MENU;
+  mode = EViewMode::Menu;   // текущий режим - Меню
+  render_menu();            // первая отрисовка меню
+}
 // Конструктор узла
 CTERMINAL::MenuNode::MenuNode(const std::string& t,
                               std::vector<MenuNode> c,

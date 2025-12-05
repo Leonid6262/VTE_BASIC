@@ -217,6 +217,10 @@ void CSIFU::set_alpha(signed short alpha)
 {
   A_Task_tick = alpha;
 }
+signed short* CSIFU::getPointerAlpha()
+{
+  return &A_Cur_tick;
+}
 void  CSIFU::set_forcing_bridge()
 {
   main_bridge = false;

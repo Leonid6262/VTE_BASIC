@@ -34,8 +34,8 @@ CREM_OSC::CREM_OSC(CDMAcontroller& rContDMA,
     {      
       // Указатели на отображаемые переменные.
       instans.getExternalPointer(CADC_STORAGE::ROTOR_CURRENT),           
-      &rPulsCalc.U_STATORA,                                                       // Напряжение статора [rms]
-      &rPulsCalc.I_STATORA,                                                       // Полный ток статора [rms]
+      rPulsCalc.getPointer_USTATORA(),                                                       // Напряжение статора [rms]
+      rPulsCalc.getPointer_ISTATORA(),                                                       // Полный ток статора [rms]
       instans.getExternalPointer(CADC_STORAGE::ROTOR_VOLTAGE),            
       instans.getExternalPointer(CADC_STORAGE::LEAKAGE_CURRENT),                                                                
       instans.getExternalPointer(CADC_STORAGE::LOAD_NODE_CURRENT),

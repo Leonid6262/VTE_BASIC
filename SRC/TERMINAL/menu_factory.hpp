@@ -1,25 +1,15 @@
 #pragma once
 
+#include "proxy_pointer_var.hpp"
 #include "AdcStorage.hpp"
 
-inline std::vector<CTERMINAL::MenuNode> makeMENU()
+// Фабрика дерева меню. Вынесена в отдельную функцию для удобства
+inline std::vector<CTERMINAL::MenuNode> MENU_Factory()
 {
-  //=====Отображаемые значения (иллюстративно)===========
-  auto& instans = CADC_STORAGE::getInstance();
+  // Указатель Prox-Singleton концентратора отображаемых/редактируемых переменных
+  CProxyPointerVar& v = CProxyPointerVar::getInstance();
   
-  auto pI_rotor = instans.getExternalPointer(CADC_STORAGE::ROTOR_CURRENT);
-  auto i_rotor_disp = 1.0f;
-  
-  auto pU_rotor = instans.getExternalPointer(CADC_STORAGE::ROTOR_VOLTAGE);
-  auto u_rotor_disp = 1.0f;
-  
-  // Указатели на измеренные значения и параметры отображения, здесь
-  // приведенны как иллюстрация. В Production метод makeMENU() должен
-  // получать данные отображения через, как вариант, централизованной 
-  // структуру Proxi Singletona или трансформироваться в отдельнфй
-  // статический класс, разделяющий код обработки (CTERMINAL) от узлов и данных.
-  
-  // Так же, в CTERMINAL в настоящий момент не реализовано:
+  // В CTERMINAL в настоящий момент НЕ реализовано:
   // 1. Обработчик и рендер редактируемых переменных
   // 2. Комплексный обработчик и рендер редактируемых и индицируемых переменных
   // 3. Обработчик исполняемых методов по булевым операциям
@@ -32,12 +22,15 @@ inline std::vector<CTERMINAL::MenuNode> makeMENU()
   static constexpr auto ushort = CTERMINAL::EVarType::USHORT;
   static constexpr auto ffloat = CTERMINAL::EVarType::FLOAT;
   static constexpr auto bbool  = CTERMINAL::EVarType::BOOL;
-  
+    
 std::vector<node> MENU_UTF = {
         node("ИНДИКАЦИЯ", {
             node("АНАЛОГОВАЯ", {
-                node("I ROTOR", {}, pI_rotor, "d", i_rotor_disp, 0, sshort),
-                node("U ROTOR", {}, pU_rotor, "d", u_rotor_disp, 0, sshort)
+                node("I-ROTOR",    {}, v.getIrotor(),      "A", v.i_rotor_disp,      0, sshort),
+                node("U-ROTOR",    {}, v.getUrotor(),      "V", v.u_rotor_disp,      0, sshort),
+                node("Irms-STATOR",{}, v.getIstatorRms(),  "A", v.i_stator_rms_disp, 1, sshort),
+                node("Urms-STATOR",{}, v.getUstatorRms(),  "V", v.u_stator_rms_disp, 1, sshort),
+                node("ALPHA-CUR",  {}, v.getAlphaCur(),  "deg", v.alpha_disp,        1, sshort),
             }),
             node("ДИСКРЕТНАЯ")
         }),

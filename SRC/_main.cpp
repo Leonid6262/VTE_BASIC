@@ -24,9 +24,11 @@ void main(void)
   static auto cont_dma  = CFactory::createDMAc();       // Управление каналами DMA. 
   
   CFactory::start_puls_system(cont_dma);                // Запуск СИФУ и всех её зависимостей. (см. CFactory)
- 
+  
+  terminal.make_menu();
+  
   CDIN_STORAGE::UserLedOff();                           // Визуальный контроль окончания инициализации
- 
+
   while(true)
   {                
     i_adc.measure_5V();         // Измерение напряжения питания +/- 5V (внутреннее ADC)        

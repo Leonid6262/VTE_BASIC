@@ -18,6 +18,8 @@
 #include "handlers_IRQ.hpp"
 #include "terminalUartDriver.hpp"
 #include "terminal.hpp"
+#include "AdcStorage.hpp"
+#include "proxy_pointer_var.hpp"
 
 class CFactory {
 public:
