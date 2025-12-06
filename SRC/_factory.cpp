@@ -14,12 +14,9 @@ CDin_cpu CFactory::createDINcpu()       { return CDin_cpu();                    
 CRTC CFactory::createRTC()              { return CRTC();                                         }
 CDMAcontroller CFactory::createDMAc()   { return CDMAcontroller();                               }
 
-bool CFactory::load_settings()
+StatusRet CFactory::load_settings()
 {
-  static CCRC16 crc16; 
-  CEEPSettings& instans = CEEPSettings::getInstance();
-  instans.init_EEP(&crc16);
-  return static_cast<bool>(instans.loadSettings());
+  return CEEPSettings::getInstance().loadSettings();
 }
 
 CSPI_ports CFactory::createSPIports()

@@ -2224,7 +2224,7 @@
             <name>$PROJ_DIR$\SRC\controllerDMA.cpp</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\SRC\crc16.cpp</name>
+            <name>$PROJ_DIR$\SRC\crc16.hpp</name>
         </file>
         <file>
             <name>$PROJ_DIR$\SRC\din_cpu.cpp</name>

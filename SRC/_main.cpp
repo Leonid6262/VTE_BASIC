@@ -13,7 +13,7 @@ void main(void)
   Timers_Initializing();                                // Инициализация таймеров.
   
   static auto terminal  = CFactory::createTERMINAL();   // Пультовый терминал. Подключен к UART-0 (см. CFactory)  
-  if(!CFactory::load_settings())                        // Создание Singleton класса CEEPSettings и загрузка уставок (RAM <- EEPROM)   
+  if(CFactory::load_settings() == StatusRet::ERROR)     // Загрузка уставок (RAM <- EEPROM)   
   { 
     /*  "Ошибка CRC. Используются уставки по умолчанию!" */ 
   }                                  

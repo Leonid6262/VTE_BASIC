@@ -103,9 +103,7 @@ private:
   // Приватные методы для работы с EEP  ---
   StatusRet readFromEEPInternal(WorkSettings& outSettings);      // Чтение в WorkSettings
   void writeToEEPInternal(WorkSettings& inSettings);             // Запись из WorkSettings
-  
-  CCRC16* pCRC16;
-  
+ 
   void EEP_init(void);
   void EEPr(uint16_t page_offset, uint16_t page_address, void* data, EEPROM_Mode_Type mode, uint32_t count);
   void EEPw(uint16_t page_offset, uint16_t page_address, void* data, EEPROM_Mode_Type mode, uint32_t count);
@@ -125,7 +123,5 @@ public:
     return settings;
   }
   
-  void init_EEP(CCRC16*); 
-   
 };
         

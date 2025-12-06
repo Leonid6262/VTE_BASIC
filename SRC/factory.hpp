@@ -20,11 +20,12 @@
 #include "terminal.hpp"
 #include "AdcStorage.hpp"
 #include "proxy_pointer_var.hpp"
+#include "bool_name.hpp"
 
 class CFactory {
 public:
     
-    static bool load_settings();
+    static StatusRet load_settings();
   
     static CSET_UART initRS485_01();
     static CSET_UART initRS485_02();

@@ -7,6 +7,7 @@
 CEEPSettings::CEEPSettings() 
 {
   settings = defaultSettings;  // Делаем все уставки дефолтными.
+  EEP_init();
 }
 
 // --- Singleton Майерса ---
@@ -33,7 +34,7 @@ StatusRet CEEPSettings::loadSettings()
 StatusRet CEEPSettings::readFromEEPInternal(WorkSettings& outSettings) 
 {
   EEPr(0, 0, reinterpret_cast<unsigned char*>(&outSettings), MODE_8_BIT, sizeof(outSettings));    //EEPROM -> RAM
-  unsigned short chs_tmp = pCRC16->calc
+  unsigned short chs_tmp = CCRC16::calc
     (
      reinterpret_cast<unsigned char*>(&outSettings) + sizeof(outSettings.checkSum), sizeof(outSettings) - sizeof(outSettings.checkSum)
        );
@@ -53,18 +54,11 @@ void CEEPSettings::saveSettings()
 // Функция записи в EEP из структуры уставок
 void CEEPSettings::writeToEEPInternal(WorkSettings& inSettings) 
 {
-  inSettings.checkSum = pCRC16->calc
+  inSettings.checkSum = CCRC16::calc
     (
      reinterpret_cast<unsigned char*>(&inSettings) + sizeof(inSettings.checkSum), sizeof(inSettings) - sizeof(inSettings.checkSum)
        );
   EEPw(0, 0, reinterpret_cast<unsigned char*>(&inSettings), MODE_8_BIT, sizeof(inSettings));      //RAM -> EEPROM
-}
-
-// Инициализируем EEPROM и получаем указатель на объект класса расчёта CRC
-void CEEPSettings::init_EEP(CCRC16* pCRC16) 
-{
-  EEP_init();
-  this->pCRC16 = pCRC16;
 }
 
 // EEP_init, EEPr, EEPw - скопированы для исключения зависимостей
